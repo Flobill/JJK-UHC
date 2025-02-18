@@ -33,6 +33,12 @@ commands:
     description: "Affiche l'état actuel de la partie"
     usage: "/gameinfo"
 
+  jjkstart:
+    description: "Lancer la partie JJK UHC"
+    usage: "/jjkstart"
+    permission: jjk.start
+    aliases: []
+
 permissions:
   jjk.use:
     description: "Permet d'ouvrir le menu de configuration"
