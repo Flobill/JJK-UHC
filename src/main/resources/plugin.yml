@@ -9,6 +9,29 @@ commands:
     description: "Commande principale de JJK UHC"
     usage: "/jjk <config|sethost>"
     aliases: []
+    default: op
+
+  spawn:
+    description: "Téléporte au spawn défini"
+    usage: "/spawn"
+
+  jump:
+    description: "Téléporte au jump défini"
+    usage: "/jump"
+
+  setspawn:
+    description: "Définit la position du spawn"
+    usage: "/setspawn"
+    default: op
+
+  setjump:
+    description: "Définit la position du jump"
+    usage: "/setjump"
+    default: op
+
+  gameinfo:
+    description: "Affiche l'état actuel de la partie"
+    usage: "/gameinfo"
 
 permissions:
   jjk.use:
