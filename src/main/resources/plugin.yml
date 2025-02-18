@@ -1,0 +1,16 @@
+name: JJKUHC
+main: me.jjkuhc.Main
+version: 1.0
+api-version: 1.18
+author: Flobill
+
+commands:
+  jjk:
+    description: "Commande principale de JJK UHC"
+    usage: "/jjk <config|sethost>"
+    aliases: []
+
+permissions:
+  jjk.use:
+    description: "Permet d'ouvrir le menu de configuration"
+    default: op
