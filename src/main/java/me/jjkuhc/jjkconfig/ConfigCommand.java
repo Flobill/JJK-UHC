@@ -1,5 +1,6 @@
 package me.jjkuhc.jjkconfig;
 
+import me.jjkuhc.host.HostManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,9 +17,16 @@ public class ConfigCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        // Vérifie que l'argument est bien "config"
+        // Vérifie si le joueur est host
+        if (!HostManager.isHost(player)) {
+            player.sendMessage("§cSeul l'host peut accéder au menu de configuration !");
+            return true;
+        }
+
+        // Ouvre le menu seulement si l'argument est bien "config"
         if (args.length == 1 && args[0].equalsIgnoreCase("config")) {
-            new ConfigMenu().open(player); // Ouvre le menu
+            player.sendMessage("§aOuverture du menu de configuration...");
+            new ConfigMenu().open(player);
         } else {
             player.sendMessage("§cUtilisation correcte : /jjk config");
         }
