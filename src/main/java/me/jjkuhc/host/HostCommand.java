@@ -8,8 +8,6 @@ import org.bukkit.entity.Player;
 
 public class HostCommand implements CommandExecutor {
 
-    private static Player host = null;
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -34,20 +32,16 @@ public class HostCommand implements CommandExecutor {
         }
 
         // Vérifie si le joueur est déjà host pour l'enlever
-        if (host != null && host.equals(target)) {
-            host = null;
+        if (HostManager.isHost(target)) {
+            HostManager.setHost(null);
             Bukkit.broadcastMessage("§c" + target.getName() + " n'est plus l'host de la partie !");
             return true;
         }
 
-        // Définir l'host
-        host = target;
+        // Définir l'host avec HostManager
+        HostManager.setHost(target);
         Bukkit.broadcastMessage("§6" + target.getName() + " est maintenant l'host de la partie !");
 
         return true;
-    }
-
-    public static Player getHost() {
-        return host;
     }
 }
