@@ -1,11 +1,13 @@
 package me.jjkuhc.jjkgame;
 
 import me.jjkuhc.host.HostManager;
+import me.jjkuhc.jjkconfig.TimerConfigMenu;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.plugin.java.JavaPlugin;
 import me.jjkuhc.scoreboard.ScoreboardManager;
@@ -22,6 +24,38 @@ public class GameStartCommand implements CommandExecutor {
     public GameStartCommand(JavaPlugin plugin, me.jjkuhc.scoreboard.ScoreboardManager scoreboardManager) {
         this.plugin = plugin;
         this.scoreboardManager = scoreboardManager;
+    }
+
+    private void startTimers() {
+        int pvpTime = TimerConfigMenu.getPvpTimer();
+        int invincibilityTime = TimerConfigMenu.getInvincibilityTimer();
+
+        // Activer le PVP globalement après le temps imparti
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage("§cPVP activé !");
+                for (World world : Bukkit.getWorlds()) {
+                    world.setPVP(true);
+                }
+            }
+        }.runTaskLater(plugin, pvpTime * 20L); // Conversion en ticks
+
+        // Désactiver l'invincibilité et autoriser les dégâts
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage("§cInvincibilité désactivée !");
+                GameManager.setCurrentState(GameState.EN_COURS);
+
+                // Désactiver tout blocage potentiel des dégâts
+                HandlerList.unregisterAll(plugin);
+
+                // Envoyer un message de debug
+                Bukkit.getLogger().info("[DEBUG] Invincibilité terminée, les dégâts sont maintenant activés.");
+            }
+        }.runTaskLater(plugin, invincibilityTime * 20L);
+
     }
 
     @Override
@@ -85,10 +119,11 @@ public class GameStartCommand implements CommandExecutor {
                 if (countdown <= 0) {
                     this.cancel();
                     Bukkit.broadcastMessage("§a🚀 Début de la partie !");
-                    Bukkit.getLogger().info("[DEBUG] Début de la partie - Téléportation en cours...");
 
                     GameManager.setCurrentState(GameState.EN_COURS);
                     scoreboardManager.updateAllScoreboards();
+
+                    startTimers(); //DÉMARRER LES TIMERS
 
                     // ✅ Téléportation d'abord
                     teleportPlayers();
@@ -106,7 +141,6 @@ public class GameStartCommand implements CommandExecutor {
                                 player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.MASTER, 10.0f, 1.0f);
                                 player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 10.0f, 1.0f);
                             }
-                            Bukkit.getLogger().info("[DEBUG] Sons et particules joués après la téléportation !");
                         }
                     }.runTaskLater(plugin, 5L); // 5 ticks = 0.25 sec après la TP
 
@@ -158,4 +192,5 @@ public class GameStartCommand implements CommandExecutor {
         Material blockType = loc.getBlock().getType();
         return blockType == Material.WATER || blockType == Material.LAVA || blockType == Material.CACTUS;
     }
+
 }
