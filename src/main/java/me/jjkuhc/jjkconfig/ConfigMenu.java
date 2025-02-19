@@ -62,9 +62,6 @@ public class ConfigMenu implements Listener {
             if (clickedItem.getType() == Material.LIME_WOOL && itemName.equals("§aLancer la Partie")) {
                 new StartGameMenu().open(player);
             }
-            if (itemName.equals("§eConfiguration Timers")) {
-                new TimerConfigMenu().open(player);
-            }
         }
     }
 }
