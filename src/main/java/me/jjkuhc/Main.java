@@ -6,6 +6,7 @@ import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
 import me.jjkuhc.jjkconfig.BorderConfigMenu;
 import me.jjkuhc.jjkconfig.ConfigMenu;
+import me.jjkuhc.jjkconfig.StartGameMenu;
 import me.jjkuhc.jjkgame.GameCommand;
 import me.jjkuhc.jjkgame.GameStartCommand;
 import me.jjkuhc.scoreboard.ScoreboardManager;
@@ -25,6 +26,8 @@ public class Main extends JavaPlugin implements Listener {
         scoreboardManager = new ScoreboardManager(this);
 
         getServer().getPluginManager().registerEvents(new BorderConfigMenu(), this);
+        getServer().getPluginManager().registerEvents(new StartGameMenu(), this);
+
 
         getCommand("jjk").setExecutor(new me.jjkuhc.commands.JJKCommand());
         getCommand("spawn").setExecutor(new CompassCommand(this));

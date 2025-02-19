@@ -59,6 +59,9 @@ public class ConfigMenu implements Listener {
             if (clickedItem.getType() == Material.GLASS && itemName.equals("§fConfiguration Bordure")) {
                 new BorderConfigMenu().open(player);
             }
+            if (clickedItem.getType() == Material.LIME_WOOL && itemName.equals("§aLancer la Partie")) {
+                new StartGameMenu().open(player);
+            }
         }
     }
 }
