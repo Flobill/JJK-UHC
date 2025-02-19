@@ -54,7 +54,4 @@ public class Main extends JavaPlugin implements Listener {
         scoreboardManager.setScoreboard(event.getPlayer());
     }
 
-    public TimerConfigMenu getTimerConfigMenu() {
-        return timerConfigMenu;
-    }
 }
