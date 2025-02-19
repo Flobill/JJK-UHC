@@ -48,6 +48,17 @@ public class ConfigMenu implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getView().getTitle().equals("§7Options §bJJK")) {
             event.setCancelled(true);
+
+            Player player = (Player) event.getWhoClicked(); // Définir le joueur
+            ItemStack clickedItem = event.getCurrentItem(); // Définir l'item cliqué
+
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+            String itemName = clickedItem.getItemMeta().getDisplayName(); // Définir le nom de l'item
+
+            if (clickedItem.getType() == Material.GLASS && itemName.equals("§fConfiguration Bordure")) {
+                new BorderConfigMenu().open(player);
+            }
         }
     }
 }

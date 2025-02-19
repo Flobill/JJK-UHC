@@ -4,6 +4,7 @@ import me.jjkuhc.jjkcompass.CompassCommand;
 import me.jjkuhc.jjkcompass.CompassGUI;
 import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
+import me.jjkuhc.jjkconfig.BorderConfigMenu;
 import me.jjkuhc.jjkconfig.ConfigMenu;
 import me.jjkuhc.jjkgame.GameCommand;
 import me.jjkuhc.jjkgame.GameStartCommand;
@@ -22,6 +23,8 @@ public class Main extends JavaPlugin implements Listener {
         getLogger().info("JJK UHC Plugin activé !");
 
         scoreboardManager = new ScoreboardManager(this);
+
+        getServer().getPluginManager().registerEvents(new BorderConfigMenu(), this);
 
         getCommand("jjk").setExecutor(new me.jjkuhc.commands.JJKCommand());
         getCommand("spawn").setExecutor(new CompassCommand(this));

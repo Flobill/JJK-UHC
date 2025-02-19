@@ -118,7 +118,6 @@ public class GameStartCommand implements CommandExecutor {
         }.runTaskTimer(plugin, 0L, 20L);
     }
 
-
     private void teleportPlayers() {
         World uhcWorld = Bukkit.getWorld("uhc"); // Assurez-vous que le monde est bien chargé
         if (uhcWorld == null) {

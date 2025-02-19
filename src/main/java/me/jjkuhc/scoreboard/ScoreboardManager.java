@@ -33,7 +33,7 @@ public class ScoreboardManager {
         scoreboard.getEntries().forEach(scoreboard::resetScores);
 
         objective.getScore("§7┏━━━━━━━━━━━━━━━━━━┓").setScore(4);
-        objective.getScore("§6▪ État : §f" + GameManager.getCurrentState()).setScore(3);
+        objective.getScore("§6▪ État : §f" + GameManager.getCurrentState().getDisplayName()).setScore(3);
         objective.getScore("§b♟ Joueurs : §a" + Bukkit.getOnlinePlayers().size() + "§7/§c20").setScore(2);
         objective.getScore("§e⭐ Host : §f" + (HostManager.getHost() != null ? HostManager.getHost().getName() : "Aucun")).setScore(1);
         objective.getScore("§7┗━━━━━━━━━━━━━━━━━━┛").setScore(0);
