@@ -4,9 +4,7 @@ import me.jjkuhc.jjkcompass.CompassCommand;
 import me.jjkuhc.jjkcompass.CompassGUI;
 import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
-import me.jjkuhc.jjkconfig.BorderConfigMenu;
-import me.jjkuhc.jjkconfig.ConfigMenu;
-import me.jjkuhc.jjkconfig.StartGameMenu;
+import me.jjkuhc.jjkconfig.*;
 import me.jjkuhc.jjkgame.GameCommand;
 import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkgame.GameStartCommand;
@@ -20,7 +18,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import me.jjkuhc.jjkconfig.TimerConfigMenu;
 
 public class Main extends JavaPlugin implements Listener {
 
@@ -54,6 +51,9 @@ public class Main extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new ConfigMenu(), this);
+
+        getServer().getPluginManager().registerEvents(new StuffConfigMenu(), this);
+        StuffManager.initialize(this);
     }
 
     @Override

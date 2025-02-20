@@ -65,6 +65,9 @@ public class ConfigMenu implements Listener {
             if (clickedItem.getType() == Material.CLOCK && itemName.equals("§eConfiguration Timers")) {
                 new TimerConfigMenu().open(player);
             }
+            if (clickedItem.getType() == Material.CHEST && itemName.equals("§6Configuration Stuff")) {
+                new StuffConfigMenu().open(player);
+            }
         }
     }
 }

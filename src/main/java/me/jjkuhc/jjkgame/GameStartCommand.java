@@ -1,6 +1,7 @@
 package me.jjkuhc.jjkgame;
 
 import me.jjkuhc.host.HostManager;
+import me.jjkuhc.jjkconfig.StuffManager;
 import me.jjkuhc.jjkconfig.TimerConfigMenu;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -178,6 +179,9 @@ public class GameStartCommand implements CommandExecutor {
             Location randomLocation = getRandomLocation(uhcWorld, spawnCenter, borderSize);
             player.teleport(randomLocation);
             player.sendMessage("§b📍 Vous avez été téléporté !");
+
+            // ✅ Donne le stuff de départ après la téléportation
+            StuffManager.giveStuff(player);
         }
 
         // Changer l'état de la partie à "En cours"

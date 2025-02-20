@@ -39,6 +39,10 @@ commands:
     permission: jjk.start
     aliases: []
 
+  savestuff:
+    description: Sauvegarde le stuff du joueur
+    usage: /savestuff
+
 permissions:
   jjk.use:
     description: "Permet d'ouvrir le menu de configuration"
