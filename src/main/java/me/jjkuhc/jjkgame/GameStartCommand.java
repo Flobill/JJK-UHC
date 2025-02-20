@@ -61,11 +61,17 @@ public class GameStartCommand implements CommandExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage("§cInvincibilité désactivée !");
+                Bukkit.broadcastMessage("§c⏳ L'invincibilité est terminée !");
                 GameManager.setCurrentState(GameState.EN_COURS);
 
-                // Désactiver tout blocage potentiel des dégâts
-                HandlerList.unregisterAll(plugin);
+                // 🔒 Réappliquer la protection de l'inventaire en fermant tous les menus
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        if (player.getOpenInventory() != null) {
+                            player.closeInventory(); // Force la fermeture des menus ouverts
+                        }
+                    }
+                });
             }
         }.runTaskLater(plugin, invincibilityTime * 20L);
     }
