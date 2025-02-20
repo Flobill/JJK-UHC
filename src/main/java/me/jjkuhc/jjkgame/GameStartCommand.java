@@ -131,12 +131,13 @@ public class GameStartCommand implements CommandExecutor {
                 if (countdown <= 0) {
                     this.cancel();
                     Bukkit.broadcastMessage("§a🚀 Début de la partie !");
-
                     GameManager.setCurrentState(GameState.EN_COURS);
                     scoreboardManager.updateAllScoreboards();
 
                     startTimers(); //DÉMARRER LES TIMERS
 
+                    // 🎭 Attribution des rôles (mais annonce différée)
+                    GameManager.assignRoles();
                     // ✅ Téléportation d'abord
                     teleportPlayers();
 

@@ -31,6 +31,8 @@ public class Main extends JavaPlugin implements Listener {
         // Charger les timers depuis la configuration
         int pvpTimer = getConfig().getInt("timers.pvp", 300); // 600s = 5 min par défaut
         int invincibilityTimer = getConfig().getInt("timers.invincibility", 90); // 120s = 1min30 par défaut
+        int roleAnnouncementTimer = getConfig().getInt("timers.role_announcement", 120);
+
 
         scoreboardManager = new ScoreboardManager(this);
 

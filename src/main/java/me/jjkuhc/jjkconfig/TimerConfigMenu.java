@@ -1,8 +1,3 @@
-// Implémentation du système de timers personnalisable pour le PVP et l'invincibilité
-// dans le plugin JJK UHC pour Minecraft en Java
-
-// Le menu "TimerConfigMenu.java" permet d'ajuster dynamiquement les timers via un inventaire interactif
-
 package me.jjkuhc.jjkconfig;
 
 import org.bukkit.Bukkit;
@@ -19,6 +14,7 @@ public class TimerConfigMenu implements Listener {
     private static int pvpTimer = 300; // Par défaut 10 minutes
     private static int invincibilityTimer = 90; // Par défaut 2 minutes
     private String selectedTimer = "PVP"; // PVP sélectionné par défaut
+    private static int roleAnnouncementTimer = 120; // Par défaut 2 minutes
 
     public void open(Player player) {
         Inventory inv = Bukkit.createInventory(null, 27, "§eConfiguration des Timers");
@@ -42,12 +38,20 @@ public class TimerConfigMenu implements Listener {
         setItem(inv, 16, Material.STONE_BUTTON, "§a+1 min");
 
         // Affichage dynamique du timer sélectionné
-        String timerDisplay = selectedTimer.equals("PVP") ? formatTime(pvpTimer) : formatTime(invincibilityTimer);
+        String timerDisplay;
+        if (selectedTimer.equals("PVP")) {
+            timerDisplay = formatTime(pvpTimer);
+        } else if (selectedTimer.equals("Invincibilité")) {
+            timerDisplay = formatTime(invincibilityTimer);
+        } else {
+            timerDisplay = formatTime(roleAnnouncementTimer); // Ajout de l'affichage correct
+        }
         setItem(inv, 13, Material.CLOCK, "§e" + timerDisplay);
 
-        // Sélecteurs de timer (PVP ou Invincibilité)
+        // Sélecteurs de timer (PVP, Invincibilité, rôles)
         setItem(inv, 3, Material.IRON_SWORD, "§bTimer PVP");
         setItem(inv, 5, Material.SHIELD, "§bTimer Invincibilité");
+        setItem(inv, 7, Material.NAME_TAG, "§bAnnonce des rôles");
 
         // Flèche de retour
         setItem(inv, 26, Material.ARROW, "§7Retour");
@@ -108,6 +112,9 @@ public class TimerConfigMenu implements Listener {
             case "§bTimer Invincibilité":
                 selectedTimer = "Invincibilité";
                 break;
+            case "§bAnnonce des rôles":
+                selectedTimer = "Annonce des rôles";
+                break;
             case "§7Retour":
                 new ConfigMenu().open(player);
                 return;
@@ -118,8 +125,10 @@ public class TimerConfigMenu implements Listener {
     private void adjustTimer(int amount) {
         if (selectedTimer.equals("PVP")) {
             pvpTimer = Math.max(10, pvpTimer + amount);
-        } else {
+        } else if (selectedTimer.equals("Invincibilité")) {
             invincibilityTimer = Math.max(10, invincibilityTimer + amount);
+        } else if (selectedTimer.equals("Annonce des rôles")) {
+            roleAnnouncementTimer = Math.max(5, roleAnnouncementTimer + amount); // Ajout du timer correct
         }
     }
 
@@ -129,5 +138,13 @@ public class TimerConfigMenu implements Listener {
 
     public static int getInvincibilityTimer() {
         return invincibilityTimer;
+    }
+
+    public static int getRoleAnnouncementTimer() {
+        return roleAnnouncementTimer;
+    }
+
+    public static void setRoleAnnouncementTimer(int time) {
+        roleAnnouncementTimer = time;
     }
 }
