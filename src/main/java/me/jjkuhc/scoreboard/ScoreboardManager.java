@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
+import me.jjkuhc.jjkroles.RoleType;
+import me.jjkuhc.jjkroles.CampType;
 
 public class ScoreboardManager {
 
@@ -29,14 +31,26 @@ public class ScoreboardManager {
         player.setScoreboard(scoreboard);
     }
 
-    private void updateScoreboard(Player player, Scoreboard scoreboard, Objective objective) {
+    public void updateScoreboard(Player player, Scoreboard scoreboard, Objective objective) {
         scoreboard.getEntries().forEach(scoreboard::resetScores);
 
-        objective.getScore("§7┏━━━━━━━━━━━━━━━━━━┓").setScore(4);
-        objective.getScore("§6▪ État : §f" + GameManager.getCurrentState().getDisplayName()).setScore(3);
-        objective.getScore("§b♟ Joueurs : §a" + Bukkit.getOnlinePlayers().size() + "§7/§c20").setScore(2);
-        objective.getScore("§e⭐ Host : §f" + (HostManager.getHost() != null ? HostManager.getHost().getName() : "Aucun")).setScore(1);
-        objective.getScore("§7┗━━━━━━━━━━━━━━━━━━┛").setScore(0);
+        RoleType playerRole = GameManager.getPlayerRole(player);
+        CampType playerCamp = (playerRole != null) ? playerRole.getCamp() : null;
+
+        objective.getScore("§7┏━━━━━━━━━━━━━━━━━━┓").setScore(7);
+        objective.getScore("§6▪ État : §f" + GameManager.getCurrentState().getDisplayName()).setScore(6);
+        objective.getScore("§b♟ Joueurs : §a" + Bukkit.getOnlinePlayers().size() + "§7/§c20").setScore(5);
+        objective.getScore("§e⭐ Host : §f" + (HostManager.getHost() != null ? HostManager.getHost().getName() : "Aucun")).setScore(4);
+
+        // 🔍 Affichage du rôle et du camp SEULEMENT après la révélation
+        if (GameManager.isState(GameState.EN_COURS) && GameManager.areRolesRevealed()) {
+            objective.getScore("§d🎭 Rôle :").setScore(3);
+            objective.getScore("§f" + (playerRole != null ? playerRole.getDisplayName() : "Non attribué")).setScore(2);
+            objective.getScore("§d⚔ Camp :").setScore(1);
+            objective.getScore("§f" + (playerCamp != null ? playerCamp.getDisplayName() : "Non attribué")).setScore(0);
+        }
+
+        objective.getScore("§7┗━━━━━━━━━━━━━━━━━━┛").setScore(-1); // Petit espace final
     }
 
     private void startUpdatingScoreboard() {

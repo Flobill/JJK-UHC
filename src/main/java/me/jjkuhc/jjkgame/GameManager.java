@@ -7,12 +7,14 @@ import me.jjkuhc.jjkroles.RoleType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import me.jjkuhc.scoreboard.ScoreboardManager;
 
 import java.util.*;
 
 public class GameManager {
     private static GameState currentState = GameState.EN_ATTENTE;
     private static final Map<UUID, RoleType> playerRoles = new HashMap<>();
+    private static boolean rolesRevealed = false;
 
     public static GameState getCurrentState() {
         return currentState;
@@ -24,6 +26,10 @@ public class GameManager {
 
     public static boolean isState(GameState state) {
         return currentState == state;
+    }
+
+    public static boolean areRolesRevealed() {
+        return rolesRevealed;
     }
 
     public static void assignRoles() {
@@ -62,11 +68,17 @@ public class GameManager {
             @Override
             public void run() {
                 Bukkit.broadcastMessage("§a📢 Les rôles ont été révélés !");
+                rolesRevealed = true;
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     RoleType role = playerRoles.get(player.getUniqueId());
                     if (role != null) {
                         player.sendMessage("§a🎭 Vous êtes : §b" + role.getDisplayName());
                     }
+                }
+                // ✅ Mise à jour du scoreboard pour tous les joueurs
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    ScoreboardManager scoreboardManager = new ScoreboardManager(Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                    scoreboardManager.setScoreboard(player);
                 }
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), roleAnnouncementTime * 20L);
