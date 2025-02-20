@@ -74,30 +74,29 @@ public class Main extends JavaPlugin implements Listener {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
-            Bukkit.getLogger().info("[DEBUG] " + player.getName() + " a reçu " + event.getDamage() + " dégâts.");
+            // Vérifier si l'invincibilité est active
+            if (GameStartCommand.isInvincibilityActive) {
+                event.setCancelled(true);
+                return;
+            }
 
+            // Vérifier si la partie est en cours pour autoriser les dégâts
             if (GameManager.getCurrentState() == GameState.EN_COURS) {
-                Bukkit.getLogger().info("[DEBUG] Les dégâts sont activés pour " + player.getName());
                 event.setCancelled(false);
             } else {
                 Bukkit.getLogger().info("[DEBUG] Dégâts annulés car la partie n'est pas en cours.");
+                event.setCancelled(true);
             }
         }
     }
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-            Player damager = event.getDamager() instanceof Player ? (Player) event.getDamager() : null;
-
-            Bukkit.getLogger().info("[DEBUG] " + player.getName() + " a été frappé par " + (damager != null ? damager.getName() : "une entité") + " pour " + event.getDamage() + " dégâts.");
-
-            if (GameManager.getCurrentState() == GameState.EN_COURS) {
-                Bukkit.getLogger().info("[DEBUG] Dégâts entre joueurs autorisés.");
-                event.setCancelled(false);
-            } else {
-                Bukkit.getLogger().info("[DEBUG] Dégâts annulés car la partie n'est pas en cours.");
+        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
+            // Vérifier si le PVP est désactivé
+            if (!Bukkit.getWorld("uhc").getPVP()) {
+                event.setCancelled(true);
+                return;
             }
         }
     }

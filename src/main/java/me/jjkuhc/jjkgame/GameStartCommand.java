@@ -18,6 +18,7 @@ import java.util.Random;
 
 public class GameStartCommand implements CommandExecutor {
 
+    public static boolean isInvincibilityActive;
     private final JavaPlugin plugin;
     private final ScoreboardManager scoreboardManager;
 
@@ -30,16 +31,30 @@ public class GameStartCommand implements CommandExecutor {
         int pvpTime = TimerConfigMenu.getPvpTimer();
         int invincibilityTime = TimerConfigMenu.getInvincibilityTimer();
 
-        // Activer le PVP globalement après le temps imparti
+        // Activer l'invincibilité dès le début
+        isInvincibilityActive = true;
+        Bukkit.broadcastMessage("§b🛡️ Invincibilité activée pour " + invincibilityTime + " secondes !");
+
+        // ❌ Désactiver le PVP dès le début
+        Bukkit.getWorld("uhc").setPVP(false);
+        Bukkit.broadcastMessage("§c⚔️ PVP désactivé jusqu'à la fin du timer !");
+
+        // Timer pour désactiver l'invincibilité
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage("§cPVP activé !");
-                for (World world : Bukkit.getWorlds()) {
-                    world.setPVP(true);
-                }
+                isInvincibilityActive = false;
             }
-        }.runTaskLater(plugin, pvpTime * 20L); // Conversion en ticks
+        }.runTaskLater(plugin, invincibilityTime * 20L);
+
+        // ✅ Timer d'activation du PVP
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.getWorld("uhc").setPVP(true);
+                Bukkit.broadcastMessage("§a⚔️ PVP activé !");
+            }
+        }.runTaskLater(plugin, pvpTime * 20L);
 
         // Désactiver l'invincibilité et autoriser les dégâts
         new BukkitRunnable() {
@@ -50,12 +65,8 @@ public class GameStartCommand implements CommandExecutor {
 
                 // Désactiver tout blocage potentiel des dégâts
                 HandlerList.unregisterAll(plugin);
-
-                // Envoyer un message de debug
-                Bukkit.getLogger().info("[DEBUG] Invincibilité terminée, les dégâts sont maintenant activés.");
             }
         }.runTaskLater(plugin, invincibilityTime * 20L);
-
     }
 
     @Override
