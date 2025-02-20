@@ -68,6 +68,9 @@ public class ConfigMenu implements Listener {
             if (clickedItem.getType() == Material.CHEST && itemName.equals("§6Configuration Stuff")) {
                 new StuffConfigMenu().open(player);
             }
+            if (clickedItem.getType() == Material.BEACON && itemName.equals("§bConfiguration Rôles")) {
+                new RoleConfigMenu().open(player);
+            }
         }
     }
 }

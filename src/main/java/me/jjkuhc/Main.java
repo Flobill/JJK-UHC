@@ -54,6 +54,9 @@ public class Main extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new StuffConfigMenu(), this);
         StuffManager.initialize(this);
+
+        getServer().getPluginManager().registerEvents(new RoleConfigMenu(), this);
+        getServer().getPluginManager().registerEvents(new CampRoleMenu(), this);
     }
 
     @Override
