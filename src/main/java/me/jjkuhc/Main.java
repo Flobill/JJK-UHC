@@ -9,6 +9,7 @@ import me.jjkuhc.jjkgame.GameCommand;
 import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkgame.GameStartCommand;
 import me.jjkuhc.jjkgame.GameState;
+import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,6 +19,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
 
 public class Main extends JavaPlugin implements Listener {
 
@@ -59,6 +61,8 @@ public class Main extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new RoleConfigMenu(), this);
         getServer().getPluginManager().registerEvents(new CampRoleMenu(), this);
+
+        getServer().getPluginManager().registerEvents(new Gojo(null), this);
     }
 
     @Override

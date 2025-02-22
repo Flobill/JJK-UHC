@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class EnergyManager {
     private static final HashMap<UUID, Integer> energyMap = new HashMap<>();
-    private static final int DEFAULT_ENERGY = 1000; // Valeur par défaut si non spécifié
+    private static final int DEFAULT_ENERGY = 200; // Valeur par défaut si non spécifié
 
     // Initialisation de l'énergie pour un joueur
     public static void setEnergy(Player player, int amount) {

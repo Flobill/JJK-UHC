@@ -4,6 +4,7 @@ import me.jjkuhc.jjkconfig.TimerConfigMenu;
 import me.jjkuhc.jjkroles.CampManager;
 import me.jjkuhc.jjkroles.CampType;
 import me.jjkuhc.jjkroles.RoleType;
+import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -67,17 +68,20 @@ public class GameManager {
             public void run() {
                 Bukkit.broadcastMessage("§a⚡ Les rôles ont été révélés !");
                 rolesRevealed = true;
+
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     RoleType role = playerRoles.get(player.getUniqueId());
                     if (role != null) {
                         player.sendMessage("§aVous êtes : §b" + role.getDisplayName());
+
+                        // ✅ Appliquer les effets de Gojo dès l'attribution du rôle
                         if (role == RoleType.GOJO) {
-                            EnergyManager.setEnergy(player, 1500);
-                        } else {
-                            EnergyManager.setEnergy(player, 1000);
+                            Gojo gojo = new Gojo(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(gojo, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
                     }
                 }
+
                 // ✅ Mise à jour du scoreboard pour tous les joueurs
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     ScoreboardManager scoreboardManager = new ScoreboardManager(Bukkit.getPluginManager().getPlugin("JJKUHC"));
