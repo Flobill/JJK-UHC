@@ -104,6 +104,5 @@ public class StuffManager implements Listener {
                 player.getInventory().addItem((ItemStack) obj);
             }
         }
-        player.sendMessage("§a✔ Stuff de départ donné !");
     }
 }

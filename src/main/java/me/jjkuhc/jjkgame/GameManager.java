@@ -42,8 +42,6 @@ public class GameManager {
         List<RoleType> shuffledRoles = new ArrayList<>(availableRoles);
         Collections.shuffle(shuffledRoles);
 
-        Bukkit.broadcastMessage("§e🎭 Attribution des rôles en cours...");
-
         int assignedRoles = 0;
         for (Player player : players) {
             if (assignedRoles < availableRoles.size()) {
@@ -67,12 +65,17 @@ public class GameManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage("§a📢 Les rôles ont été révélés !");
+                Bukkit.broadcastMessage("§a⚡ Les rôles ont été révélés !");
                 rolesRevealed = true;
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     RoleType role = playerRoles.get(player.getUniqueId());
                     if (role != null) {
-                        player.sendMessage("§a🎭 Vous êtes : §b" + role.getDisplayName());
+                        player.sendMessage("§aVous êtes : §b" + role.getDisplayName());
+                        if (role == RoleType.GOJO) {
+                            EnergyManager.setEnergy(player, 1500);
+                        } else {
+                            EnergyManager.setEnergy(player, 1000);
+                        }
                     }
                 }
                 // ✅ Mise à jour du scoreboard pour tous les joueurs

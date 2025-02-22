@@ -38,9 +38,10 @@ public class RoleConfigMenu implements Listener {
         }
 
         // Ajout des vitres pour les camps
-        setCampItem(inv, 46, Material.RED_STAINED_GLASS_PANE, "§cExorcistes", CampType.EXORCISTES);
-        setCampItem(inv, 49, Material.RED_STAINED_GLASS_PANE, "§cFléaux", CampType.FLEAUX);
-        setCampItem(inv, 52, Material.RED_STAINED_GLASS_PANE, "§cNeutres", CampType.NEUTRES);
+        setCampItem(inv, 45, Material.RED_STAINED_GLASS_PANE, "§cExorcistes", CampType.EXORCISTES);
+        setCampItem(inv, 47, Material.RED_STAINED_GLASS_PANE, "§cFléaux", CampType.FLEAUX);
+        setCampItem(inv, 49, Material.RED_STAINED_GLASS_PANE, "§cYuta & Rika", CampType.YUTA_RIKA);
+        setCampItem(inv, 51, Material.RED_STAINED_GLASS_PANE, "§cNeutres", CampType.NEUTRES);
 
         // Marquer le camp actif en vert
         markActiveCamp(inv, currentCamp);
@@ -70,9 +71,10 @@ public class RoleConfigMenu implements Listener {
     private void markActiveCamp(Inventory inv, CampType activeCamp) {
         int slot;
         switch (activeCamp) {
-            case EXORCISTES -> slot = 46;
-            case FLEAUX -> slot = 49;
-            case NEUTRES -> slot = 52;
+            case EXORCISTES -> slot = 45;
+            case FLEAUX -> slot = 47;
+            case YUTA_RIKA -> slot = 49;
+            case NEUTRES -> slot = 51;
             default -> { return; }
         }
         ItemStack activeGlass = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
@@ -120,9 +122,10 @@ public class RoleConfigMenu implements Listener {
     private CampType getCampForRole(RoleType role) {
         return switch (role) {
             case GOJO, MEGUMI -> CampType.EXORCISTES;
-            case SUKUNA -> CampType.FLEAUX;
-            case TOJI, YUTA -> CampType.NEUTRES;
-            default -> CampType.EXORCISTES; // Exorciste Basique et tous les autres cas non définis
+            case JOGO -> CampType.FLEAUX;
+            case TOJI, SUKUNA -> CampType.NEUTRES;
+            case YUTA, RIKA -> CampType.YUTA_RIKA;
+            default -> CampType.EXORCISTES;
         };
     }
 }

@@ -22,9 +22,10 @@ public class CampRoleMenu implements Listener {
         }
 
         // Ajout des vitres de navigation entre camps
-        setCampItem(inv, 46, Material.RED_STAINED_GLASS_PANE, "§cExorcistes", camp.equals("Exorcistes"));
-        setCampItem(inv, 49, Material.RED_STAINED_GLASS_PANE, "§cFléaux", camp.equals("Fléaux"));
-        setCampItem(inv, 52, Material.RED_STAINED_GLASS_PANE, "§cNeutres", camp.equals("Neutres"));
+        setCampItem(inv, 45, Material.RED_STAINED_GLASS_PANE, "§cExorcistes", camp.equals("Exorcistes"));
+        setCampItem(inv, 47, Material.RED_STAINED_GLASS_PANE, "§cFléaux", camp.equals("Fléaux"));
+        setCampItem(inv, 49, Material.RED_STAINED_GLASS_PANE, "§cYuta & Rika", camp.equals("Yuta & Rika"));
+        setCampItem(inv, 51, Material.RED_STAINED_GLASS_PANE, "§cNeutres", camp.equals("Neutres"));
 
         // Flèche de retour
         setItem(inv, 53, Material.ARROW, "§7Retour");
@@ -65,6 +66,9 @@ public class CampRoleMenu implements Listener {
                 break;
             case "§cFléaux":
                 new CampRoleMenu().open(player, "Fléaux");
+                break;
+            case "§cYuta & Rika":
+                new CampRoleMenu().open(player, "Yuta & Rika");
                 break;
             case "§cNeutres":
                 new CampRoleMenu().open(player, "Neutres");

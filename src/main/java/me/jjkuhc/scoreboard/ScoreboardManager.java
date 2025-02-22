@@ -1,6 +1,7 @@
 package me.jjkuhc.scoreboard;
 
 import me.jjkuhc.host.HostManager;
+import me.jjkuhc.jjkgame.EnergyManager;
 import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkgame.GameState;
 import org.bukkit.Bukkit;
@@ -39,18 +40,21 @@ public class ScoreboardManager {
 
         objective.getScore("§7┏━━━━━━━━━━━━━━━━━━┓").setScore(7);
         objective.getScore("§6▪ État : §f" + GameManager.getCurrentState().getDisplayName()).setScore(6);
-        objective.getScore("§b♟ Joueurs : §a" + Bukkit.getOnlinePlayers().size() + "§7/§c20").setScore(5);
+        objective.getScore("§b☺ Joueurs : §a" + Bukkit.getOnlinePlayers().size() + "§7/§c20").setScore(5);
         objective.getScore("§e⭐ Host : §f" + (HostManager.getHost() != null ? HostManager.getHost().getName() : "Aucun")).setScore(4);
 
         // 🔍 Affichage du rôle et du camp SEULEMENT après la révélation
         if (GameManager.isState(GameState.EN_COURS) && GameManager.areRolesRevealed()) {
-            objective.getScore("§d🎭 Rôle :").setScore(3);
-            objective.getScore("§f" + (playerRole != null ? playerRole.getDisplayName() : "Non attribué")).setScore(2);
-            objective.getScore("§d⚔ Camp :").setScore(1);
-            objective.getScore("§f" + (playerCamp != null ? playerCamp.getDisplayName() : "Non attribué")).setScore(0);
+            objective.getScore("§d♜ Rôle :").setScore(3);
+            objective.getScore("§f" + (playerRole != null ? playerRole.getDisplayName() : "Non attribué")).setScore(3);
+            objective.getScore("§d⚔ Camp :").setScore(2);
+            objective.getScore("§f" + (playerCamp != null ? playerCamp.getDisplayName() : "Non attribué")).setScore(2);
+            int energy = EnergyManager.getEnergy(player);
+            objective.getScore("❇ §dÉnergie Occulte :").setScore(1);
+            objective.getScore("§b" + energy).setScore(0);
         }
 
-        objective.getScore("§7┗━━━━━━━━━━━━━━━━━━┛").setScore(-1); // Petit espace final
+        objective.getScore("§7┗━━━━━━━━━━━━━━━━━━┛").setScore(-1);
     }
 
     private void startUpdatingScoreboard() {

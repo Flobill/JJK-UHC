@@ -34,7 +34,7 @@ public class GameStartCommand implements CommandExecutor {
 
         // Activer l'invincibilité dès le début
         isInvincibilityActive = true;
-        Bukkit.broadcastMessage("§b🛡️ Invincibilité activée pour " + invincibilityTime + " secondes !");
+        Bukkit.broadcastMessage("§bInvincibilité activée pour " + invincibilityTime + " secondes !");
 
         // ❌ Désactiver le PVP dès le début
         Bukkit.getWorld("uhc").setPVP(false);
@@ -61,7 +61,7 @@ public class GameStartCommand implements CommandExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage("§c⏳ L'invincibilité est terminée !");
+                Bukkit.broadcastMessage("§c⌛ L'invincibilité est terminée !");
                 GameManager.setCurrentState(GameState.EN_COURS);
 
                 // 🔒 Réappliquer la protection de l'inventaire en fermant tous les menus
@@ -120,7 +120,7 @@ public class GameStartCommand implements CommandExecutor {
             @Override
             public void run() {
                 if (countdown == 30 || countdown == 10 || countdown <= 5) {
-                    Bukkit.broadcastMessage("§e⏳ Début dans §c" + countdown + "s !");
+                    Bukkit.broadcastMessage("§e⌛ Début dans §c" + countdown + "s !");
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 10);
                         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.5f);
@@ -136,7 +136,7 @@ public class GameStartCommand implements CommandExecutor {
 
                 if (countdown <= 0) {
                     this.cancel();
-                    Bukkit.broadcastMessage("§a🚀 Début de la partie !");
+                    Bukkit.broadcastMessage("§a⌚ Début de la partie !");
                     GameManager.setCurrentState(GameState.EN_COURS);
                     scoreboardManager.updateAllScoreboards();
 
@@ -185,7 +185,7 @@ public class GameStartCommand implements CommandExecutor {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Location randomLocation = getRandomLocation(uhcWorld, spawnCenter, borderSize);
             player.teleport(randomLocation);
-            player.sendMessage("§b📍 Vous avez été téléporté !");
+            player.sendMessage("§b➡ Vous avez été téléporté !");
 
             // ✅ Donne le stuff de départ après la téléportation
             StuffManager.giveStuff(player);

@@ -3,7 +3,8 @@ package me.jjkuhc.jjkroles;
 public enum CampType {
     EXORCISTES("Exorcistes"),
     FLEAUX("Fléaux"),
-    NEUTRES("Neutres");
+    NEUTRES("Neutres"),
+    YUTA_RIKA("Yuta & Rika"); // Nouveau camp ajouté
 
     private final String displayName;
 
