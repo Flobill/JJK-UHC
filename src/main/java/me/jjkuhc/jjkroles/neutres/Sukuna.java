@@ -1,0 +1,499 @@
+package me.jjkuhc.jjkroles.neutres;
+
+import me.jjkuhc.jjkgame.EnergyManager;
+import me.jjkuhc.jjkgame.GameManager;
+import me.jjkuhc.jjkroles.CampManager;
+import me.jjkuhc.jjkroles.CampType;
+import me.jjkuhc.jjkroles.RoleType;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.*;
+
+public class Sukuna implements Listener {
+    private final Player player;
+    private final Plugin plugin;
+    private final Set<UUID> weakFléaux = new HashSet<>();
+    private int fingerCount = 0;
+
+    public Sukuna(Player player, Plugin plugin) {
+        this.player = player;
+        this.plugin = plugin;
+
+        if (player != null && player.isOnline()) {
+            applyPermanentEffects();
+            EnergyManager.setEnergy(player, 1500);
+            giveCompass();
+            startCompassUpdate();
+            giveInnateSpellsItem();
+        }
+    }
+
+    // ✅ Appliquer les effets permanents de Sukuna
+    private void applyPermanentEffects() {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false)); // Résistance permanente
+        applyNightStrength();
+    }
+
+    private void applyNightStrength() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (isNight(player.getWorld())) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 600, 0, false, false)); // Force I pendant la nuit
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 600L); // Vérifie toutes les 30 secondes
+    }
+
+    private boolean isNight(World world) {
+        long time = world.getTime();
+        return time >= 13000 && time <= 23000;
+    }
+
+    // ✅ Donner une boussole qui traque les porteurs de doigts
+    private void giveCompass() {
+        ItemStack compass = new ItemStack(Material.COMPASS);
+        CompassMeta meta = (CompassMeta) compass.getItemMeta();
+        meta.setDisplayName("§cBoussole de Sukuna");
+        compass.setItemMeta(meta);
+        player.getInventory().addItem(compass);
+    }
+
+    // ✅ Met à jour la boussole toutes les 30 secondes
+    private void startCompassUpdate() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                updateCompass();
+            }
+        }.runTaskTimer(plugin, 0L, 600L); // Toutes les 30 secondes (600 ticks)
+    }
+
+    private void updateCompass() {
+        Player target = getNearestPlayerWithFinger();
+        if (target != null) {
+            player.setCompassTarget(target.getLocation());
+        } else {
+            player.sendMessage("§cAucun porteur de doigt trouvé !");
+        }
+    }
+
+    // ✅ Cherche le joueur le plus proche avec un doigt
+    private Player getNearestPlayerWithFinger() {
+        Player nearest = null;
+        double closestDistance = Double.MAX_VALUE;
+
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            if (!target.equals(player) && hasSukunaFinger(target)) {
+                double distance = target.getLocation().distance(player.getLocation());
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    nearest = target;
+                }
+            }
+        }
+        return nearest;
+    }
+
+    // ✅ Vérifie si un joueur possède un doigt de Sukuna
+    private boolean hasSukunaFinger(Player target) {
+        for (ItemStack item : target.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.NETHER_WART) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ✅ Événements pour gérer les doigts de Sukuna
+    @EventHandler
+    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+        if (event.getPlayer().equals(player) && event.getItem().getItemStack().getType() == Material.NETHER_WART) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                updateFingerEffects();
+            }, 1L);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        if (event.getPlayer().equals(player) && event.getItemDrop().getItemStack().getType() == Material.NETHER_WART) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                updateFingerEffects();
+            }, 1L);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getWhoClicked() instanceof Player) {
+            Player p = (Player) event.getWhoClicked();
+            if (p.equals(player)) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    updateFingerEffects();
+                }, 1L);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (event.getPlayer().equals(player)) {
+            updateFingerEffects();
+        }
+    }
+
+    // ✅ Gérer les effets liés aux doigts de Sukuna
+    private void updateFingerEffects() {
+        int currentFingers = countSukunaFingers();
+
+        if (currentFingers != fingerCount) {
+            fingerCount = currentFingers;
+            applyFingerEffects();
+        }
+    }
+
+    private int countSukunaFingers() {
+        int count = 0;
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.NETHER_WART) {
+                count += item.getAmount();
+            }
+        }
+        return count;
+    }
+
+    private void applyFingerEffects() {
+        // ✅ Réinitialise les effets précédents
+        player.removePotionEffect(PotionEffectType.SPEED);
+        removePermanentHearts();
+
+        double baseHealth = 20.0; // 10 cœurs de base
+        double extraHearts = 0; // Variable pour stocker les cœurs supplémentaires
+
+        // ✅ Chaque doigt donne 1 cœur permanent sauf le 3ème doigt qui donne Speed I
+        for (int i = 1; i <= fingerCount; i++) {
+            if (i == 3) {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false)); // Speed I au 3ème doigt
+            } else {
+                extraHearts += 2; // 1 cœur = 2 points de vie
+            }
+        }
+
+        // ✅ Appliquer Weakness aux fléaux si 5 doigts
+        if (fingerCount >= 5) {
+            applyWeaknessToFleauxNearby();
+        }
+
+        // ✅ Appliquer les cœurs supplémentaires
+        double totalHealth = baseHealth + extraHearts;
+        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(totalHealth);
+
+        // ✅ Retirer Speed si le joueur repasse sous 3 doigts
+        if (fingerCount < 3) {
+            player.removePotionEffect(PotionEffectType.SPEED);
+        }
+
+        player.sendMessage("§5☠️ Vous avez actuellement " + fingerCount + " doigt(s) de Sukuna !");
+    }
+
+    // ✅ Retirer les cœurs supplémentaires
+    private void removePermanentHearts() {
+        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0); // 10 cœurs de base
+    }
+
+    // ✅ Infliger Weakness aux fléaux proches
+    private void applyWeaknessToFleauxNearby() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (fingerCount >= 5) {
+                    for (Player target : Bukkit.getOnlinePlayers()) {
+                        if (!target.equals(player) && target.getLocation().distance(player.getLocation()) <= 10) {
+                            // ✅ Appliquer Weakness si le joueur est un fléau
+                            if (CampManager.getInstance().getCampOfRole(GameManager.getPlayerRole(target)) == CampType.FLEAUX) {
+                                target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100, 0)); // Weakness pendant 5 secondes
+                            }
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 100L); // Vérifie toutes les 5 secondes
+    }
+
+    // ✅ Distribution de la Nether Star des Sorts Innés
+    private void giveInnateSpellsItem() {
+        ItemStack innateSpells = new ItemStack(Material.NETHER_STAR);
+        ItemMeta meta = innateSpells.getItemMeta();
+        meta.setDisplayName("§cSorts Innés de Sukuna");
+        innateSpells.setItemMeta(meta);
+        player.getInventory().addItem(innateSpells);
+        player.sendMessage("§c✨ Vous avez reçu vos Sorts Innés !");
+    }
+
+    // ✅ Cooldowns pour les capacités
+    private boolean innateLeftCooldown = false;
+    private boolean innateRightCooldown = false;
+
+    // ✅ Gestion des clics sur la Nether Star
+    @EventHandler
+    public void onInnateSpellsUse(PlayerInteractEvent event) {
+        if (!event.getPlayer().equals(player)) return;
+
+        ItemStack item = event.getItem();
+        if (item == null || item.getType() != Material.NETHER_STAR) return;
+        if (!item.getItemMeta().getDisplayName().equals("§cSorts Innés de Sukuna")) return;
+
+        Action action = event.getAction();
+
+        if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+            useAdvanceAndDamage();
+        } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+            useAbsorption();
+        }
+    }
+
+    // ✅ Clic gauche : Avancer de 4 blocs et infliger des effets
+    private void useAdvanceAndDamage() {
+        if (innateLeftCooldown) {
+            player.sendMessage("§c⏳ Sort indisponible, temps de recharge actif !");
+            return;
+        }
+
+        if (EnergyManager.getEnergy(player) < 300) {
+            player.sendMessage("§c❌ Pas assez d'énergie occulte !");
+            return;
+        }
+
+        EnergyManager.reduceEnergy(player, 300);
+
+        // Avance de 4 blocs
+        Location start = player.getLocation();
+        @NotNull Vector direction = start.getDirection().normalize().multiply(4);
+        Location end = start.add(direction);
+        player.teleport(end);
+        player.sendMessage("§c⚡ Vous vous êtes déplacé de 4 blocs avec puissance !");
+
+        // Vérifie si un joueur est touché
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            if (!target.equals(player) && target.getWorld().equals(player.getWorld())
+                    && target.getLocation().distance(end) <= 1.5) {
+                double healthReduction = 4.0; // -2 cœurs permanents
+                target.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(
+                        target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() - healthReduction
+                );
+                target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 10)); // Immobilisation 0.5 sec
+                target.sendMessage("§c💔 Vous avez été frappé par Sukuna, -2 cœurs temporaires !");
+
+                // Restaurer les cœurs après 1 min 30 sec
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        target.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(
+                                target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() + healthReduction
+                        );
+                        target.sendMessage("§a❤️ Vos cœurs perdus ont été restaurés !");
+                    }
+                }.runTaskLater(plugin, 1800L); // 1 min 30 sec (1800 ticks)
+                break;
+            }
+        }
+
+        // Début du cooldown de 4 minutes
+        innateLeftCooldown = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                innateLeftCooldown = false;
+                player.sendMessage("§a🌀 Votre sort gauche est prêt à être réutilisé !");
+            }
+        }.runTaskLater(plugin, 4800L); // 4 minutes
+    }
+
+    // ✅ Clic droit : 3 cœurs d'absorption pendant 4 secondes
+    private void useAbsorption() {
+        if (innateRightCooldown) {
+            player.sendMessage("§c⏳ Sort indisponible, temps de recharge actif !");
+            return;
+        }
+
+        if (EnergyManager.getEnergy(player) < 300) {
+            player.sendMessage("§c❌ Pas assez d'énergie occulte !");
+            return;
+        }
+
+        EnergyManager.reduceEnergy(player, 300);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 80, 2)); // 3 cœurs d'absorption
+
+        player.sendMessage("§b💖 Vous bénéficiez de 3 cœurs d'absorption temporairement !");
+
+        // Début du cooldown de 5 minutes
+        innateRightCooldown = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                innateRightCooldown = false;
+                player.sendMessage("§a🌀 Votre sort droit est prêt à être réutilisé !");
+            }
+        }.runTaskLater(plugin, 6000L); // 5 minutes
+    }
+
+    public static void initiateFingerSteal(Player sukuna, String targetName) {
+        Player target = Bukkit.getPlayer(targetName);
+
+        if (target == null || !target.isOnline()) {
+            sukuna.sendMessage("§cLe joueur spécifié est introuvable ou hors-ligne.");
+            return;
+        }
+
+        // ✅ Vérifie que Sukuna possède le rôle
+        if (!GameManager.getPlayerRole(sukuna).equals(RoleType.SUKUNA)) {
+            sukuna.sendMessage("§cVous devez être Sukuna pour utiliser cette commande !");
+            return;
+        }
+
+        // ✅ Vérifie que le joueur ciblé possède un doigt
+        boolean hasFinger = false;
+        for (ItemStack item : target.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.NETHER_WART) {
+                hasFinger = true;
+                break;
+            }
+        }
+
+        if (!hasFinger) {
+            sukuna.sendMessage("§cCe joueur ne possède pas de doigt de Sukuna !");
+            return;
+        }
+
+        // ✅ Vérifie que Sukuna a assez d'énergie
+        if (EnergyManager.getEnergy(sukuna) < 600) {
+            sukuna.sendMessage("§cPas assez d'énergie occulte !");
+            return;
+        }
+
+        EnergyManager.reduceEnergy(sukuna, 600);
+        sukuna.sendMessage("§5☠️ Vous avez lancé le vol de doigt sur " + target.getName() + " !");
+
+        // ✅ Crée une barre de boss pour afficher la progression
+        BossBar stealProgressBar = Bukkit.createBossBar("§5Vol de doigt en cours...", BarColor.PURPLE, BarStyle.SOLID);
+        stealProgressBar.addPlayer(sukuna);
+        stealProgressBar.setProgress(0.0);
+
+        final int totalTicks = 180 * 20; // 3 minutes = 180 secondes * 20 ticks
+        final int[] ticksPassed = {0};
+
+        // ✅ Lancer le vol avec une vérification régulière
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // ✅ Si la cible meurt, annuler le vol
+                if (target.isDead() || !target.isOnline()) {
+                    sukuna.sendMessage("§cLe vol a échoué : le joueur est mort ou déconnecté !");
+                    stealProgressBar.removeAll();
+                    this.cancel();
+                    return;
+                }
+
+                // ✅ Vérifie si Sukuna est à moins de 15 blocs
+                if (sukuna.getLocation().distance(target.getLocation()) > 15) {
+                    sukuna.sendMessage("§e⚠️ Trop éloigné du joueur cible, rapprochez-vous !");
+                    return; // Le vol est temporairement suspendu
+                }
+
+                // ✅ Mise à jour de la barre de progression
+                ticksPassed[0] += 20; // +1 seconde (20 ticks)
+                double progress = (double) ticksPassed[0] / totalTicks;
+                stealProgressBar.setProgress(progress);
+
+                // ✅ Si le vol est terminé
+                if (ticksPassed[0] >= totalTicks) {
+                    // ✅ Transférer les doigts
+                    for (ItemStack item : target.getInventory().getContents()) {
+                        if (item != null && item.getType() == Material.NETHER_WART) {
+                            target.getInventory().remove(item);
+                            sukuna.getInventory().addItem(item);
+                            sukuna.sendMessage("§5Vous avez récupéré un doigt de Sukuna !");
+                        }
+                    }
+
+                    // ✅ Mise à jour des effets des doigts pour Sukuna
+                    updateSukunaFingerEffects(sukuna);
+
+                    // ✅ Envoyer un message 5 minutes après le vol
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (target.isOnline()) {
+                                target.sendMessage("§4⚠ Vous avez découvert que Sukuna vous a volé un ou plusieurs doigts !");
+                            }
+                        }
+                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 6000L); // 5 minutes (6000 ticks)
+
+                    stealProgressBar.removeAll();
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 20L); // Exécuté toutes les secondes
+    }
+
+    // ✅ Mise à jour des effets de Sukuna en fonction des doigts volés
+    private static void updateSukunaFingerEffects(Player sukuna) {
+        int fingerCount = 0;
+        for (ItemStack item : sukuna.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.NETHER_WART) {
+                fingerCount += item.getAmount();
+            }
+        }
+
+        // ✅ Remise à zéro des effets
+        sukuna.removePotionEffect(PotionEffectType.SPEED);
+        sukuna.removePotionEffect(PotionEffectType.WEAKNESS);
+        sukuna.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0); // 10 cœurs de base
+
+        // ✅ Appliquer les effets en fonction du nombre de doigts
+        if (fingerCount >= 3) {
+            sukuna.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
+        } else {
+            sukuna.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20.0 + (fingerCount * 2)); // Chaque doigt = 1 cœur
+        }
+
+        if (fingerCount >= 5) {
+            sukuna.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Integer.MAX_VALUE, 0));
+        }
+
+        sukuna.sendMessage("§5☠️ Vous possédez maintenant " + fingerCount + " doigt(s) !");
+    }
+}

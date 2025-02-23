@@ -6,6 +6,7 @@ import me.jjkuhc.jjkroles.CampManager;
 import me.jjkuhc.jjkroles.CampType;
 import me.jjkuhc.jjkroles.RoleType;
 import me.jjkuhc.jjkroles.exorcistes.Gojo;
+import me.jjkuhc.jjkroles.neutres.Sukuna;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -95,6 +96,10 @@ public class GameManager {
                         if (role == RoleType.GOJO) {
                             Gojo gojo = new Gojo(player);
                             Bukkit.getServer().getPluginManager().registerEvents(gojo, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
+                        if (role == RoleType.SUKUNA) {
+                            Sukuna sukuna = new Sukuna(player, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                            Bukkit.getServer().getPluginManager().registerEvents(sukuna, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
                     }
                 }

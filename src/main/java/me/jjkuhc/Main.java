@@ -6,7 +6,6 @@ import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
 import me.jjkuhc.jjkconfig.*;
 import me.jjkuhc.jjkgame.*;
-import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -61,8 +60,6 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new CampRoleMenu(), this);
         getServer().getPluginManager().registerEvents(new SukunaFingerListener(), this);
 
-        //Les rôles
-        getServer().getPluginManager().registerEvents(new Gojo(null), this);
     }
 
     @Override

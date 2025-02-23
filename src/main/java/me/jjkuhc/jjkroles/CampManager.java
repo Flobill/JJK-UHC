@@ -51,4 +51,14 @@ public class CampManager {
     public CampType getCurrentCamp() {
         return currentCamp;
     }
+
+    // ✅ Récupérer le camp d'un joueur en fonction de son rôle
+    public CampType getCampOfRole(RoleType role) {
+        for (Map.Entry<CampType, Set<RoleType>> entry : activeRoles.entrySet()) {
+            if (entry.getValue().contains(role)) {
+                return entry.getKey();
+            }
+        }
+        return null; // Aucun camp trouvé
+    }
 }

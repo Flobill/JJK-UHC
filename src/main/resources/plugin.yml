@@ -7,7 +7,7 @@ author: Flobill
 commands:
   jjk:
     description: "Commande principale de JJK UHC"
-    usage: "/jjk <config|sethost>"
+    usage: "/jjk <config|sethost|recuperer>"
     aliases: []
     default: op
 

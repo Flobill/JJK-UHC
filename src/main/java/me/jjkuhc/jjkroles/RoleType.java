@@ -2,7 +2,7 @@ package me.jjkuhc.jjkroles;
 
 public enum RoleType {
     GOJO(CampType.EXORCISTES, "Gojo"),
-    SUKUNA(CampType.FLEAUX, "Sukuna"),
+    SUKUNA(CampType.NEUTRES, "Sukuna"),
     MEGUMI(CampType.FLEAUX, "Megumi"),
     YUTA(CampType.YUTA_RIKA, "Yuta Okkotsu"),
     RIKA(CampType.YUTA_RIKA, "Rika Orimoto"),
