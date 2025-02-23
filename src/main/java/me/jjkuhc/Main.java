@@ -5,10 +5,7 @@ import me.jjkuhc.jjkcompass.CompassGUI;
 import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
 import me.jjkuhc.jjkconfig.*;
-import me.jjkuhc.jjkgame.GameCommand;
-import me.jjkuhc.jjkgame.GameManager;
-import me.jjkuhc.jjkgame.GameStartCommand;
-import me.jjkuhc.jjkgame.GameState;
+import me.jjkuhc.jjkgame.*;
 import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
@@ -52,6 +49,7 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new CompassGUI(this), this);
         getCommand("gameinfo").setExecutor(new GameCommand());
         getCommand("jjkstart").setExecutor(new GameStartCommand(this, scoreboardManager));
+        this.getCommand("giveenergy").setExecutor(new EnergyManager());
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new ConfigMenu(), this);

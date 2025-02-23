@@ -43,6 +43,11 @@ commands:
     description: Sauvegarde le stuff du joueur
     usage: /savestuff
 
+  giveenergy:
+    description: Donne de l'énergie occulte à un joueur.
+    usage: /giveenergy <joueur> <quantité>
+    permission: jjk.giveenergy
+
 permissions:
   jjk.use:
     description: "Permet d'ouvrir le menu de configuration"
