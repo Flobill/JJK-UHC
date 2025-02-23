@@ -35,10 +35,11 @@ public class Main extends JavaPlugin implements Listener {
 
         scoreboardManager = new ScoreboardManager(this);
 
+        //Les menus
         getServer().getPluginManager().registerEvents(new BorderConfigMenu(), this);
         getServer().getPluginManager().registerEvents(new StartGameMenu(), this);
         getServer().getPluginManager().registerEvents(new TimerConfigMenu(), this);
-
+        getServer().getPluginManager().registerEvents(new SukunaFingerMenu(), this);
 
         getCommand("jjk").setExecutor(new me.jjkuhc.commands.JJKCommand());
         getCommand("spawn").setExecutor(new CompassCommand(this));
@@ -51,15 +52,16 @@ public class Main extends JavaPlugin implements Listener {
         getCommand("jjkstart").setExecutor(new GameStartCommand(this, scoreboardManager));
         this.getCommand("giveenergy").setExecutor(new EnergyManager());
 
+        //Les menus
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new ConfigMenu(), this);
-
         getServer().getPluginManager().registerEvents(new StuffConfigMenu(), this);
         StuffManager.initialize(this);
-
         getServer().getPluginManager().registerEvents(new RoleConfigMenu(), this);
         getServer().getPluginManager().registerEvents(new CampRoleMenu(), this);
+        getServer().getPluginManager().registerEvents(new SukunaFingerListener(), this);
 
+        //Les rôles
         getServer().getPluginManager().registerEvents(new Gojo(null), this);
     }
 

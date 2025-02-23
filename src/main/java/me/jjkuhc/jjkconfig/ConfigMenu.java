@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Collections;
+
 public class ConfigMenu implements Listener {
 
     public void open(Player player) {
@@ -26,6 +28,7 @@ public class ConfigMenu implements Listener {
         }
 
         // Ajout des items du menu
+        setItem(inv, 4, Material.NETHER_WART, "§5Doigts de Sukuna");
         setItem(inv, 10, Material.LIME_WOOL, "§aLancer la Partie");
         setItem(inv, 12, Material.BEACON, "§bConfiguration Rôles");
         setItem(inv, 14, Material.CLOCK, "§eConfiguration Timers");
@@ -56,6 +59,9 @@ public class ConfigMenu implements Listener {
 
             String itemName = clickedItem.getItemMeta().getDisplayName(); // Définir le nom de l'item
 
+            if (clickedItem.getType() == Material.NETHER_WART && clickedItem.getItemMeta().getDisplayName().equals("§5Doigts de Sukuna")) {
+                SukunaFingerMenu.openFingerMenu(player);
+            }
             if (clickedItem.getType() == Material.GLASS && itemName.equals("§fConfiguration Bordure")) {
                 new BorderConfigMenu().open(player);
             }

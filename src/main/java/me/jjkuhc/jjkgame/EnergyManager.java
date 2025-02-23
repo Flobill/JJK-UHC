@@ -12,6 +12,7 @@ import java.util.UUID;
 public class EnergyManager implements CommandExecutor {
     private static final HashMap<UUID, Integer> energyMap = new HashMap<>();
     private static final int DEFAULT_ENERGY = 200; // Valeur par défaut si non spécifié
+    private static final HashMap<UUID, Integer> sukunaFingersMap = new HashMap<>();
 
     // Initialisation de l'énergie pour un joueur
     public static void setEnergy(Player player, int amount) {
