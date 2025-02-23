@@ -16,6 +16,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.*;
 
@@ -119,9 +121,14 @@ public class Gojo implements Listener {
         }
 
         // ✅ Gestion du bandeau de Gojo
+        // ✅ Activation de la Sphère de l'Espace Infini - Shift + Clic Droit sur le bandeau
         if (itemName.equals("§9Bandeau de Gojo")) {
             if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-                activateBandeau();
+                if (player.isSneaking()) {
+                    activateInfiniteSphere();
+                } else {
+                    activateBandeau();
+                }
             }
         }
     }
@@ -263,5 +270,138 @@ public class Gojo implements Listener {
                 checkBandeauCooldown();
             }
         }.runTaskTimer(plugin, 0L, 100L); // Vérifie toutes les 5 secondes (100 ticks)
+    }
+
+    // ✅ Sphère de l'Espace Infini avec téléportation automatique après 1 minute
+    private void activateInfiniteSphere() {
+        if (EnergyManager.getEnergy(player) < 1500) {
+            player.sendMessage("§cPas assez d'énergie occulte pour activer la Sphère !");
+            return;
+        }
+
+        EnergyManager.reduceEnergy(player, 1500);
+        player.sendMessage("§b♾️ Vous avez activé la Sphère de l'Espace Infini !");
+
+        World gojoWorld = Bukkit.getWorld("Gojo");
+        if (gojoWorld == null) {
+            player.sendMessage("§cLe monde 'Gojo' n'existe pas !");
+            return;
+        }
+
+        Location spawnLocation = gojoWorld.getSpawnLocation();
+        List<Player> nearbyPlayers = getNearbyPlayers(20);
+        teleportPlayersToSphere(nearbyPlayers, gojoWorld, spawnLocation);
+
+        player.sendMessage("§aLes joueurs ont été téléportés dans la Sphère !");
+
+        // ✅ Démarre un timer de 1 minute (1200 ticks) pour téléporter tout le monde de retour
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                returnPlayersToUHC(nearbyPlayers);
+            }
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 1200L); // 1 minute = 1200 ticks
+    }
+
+    // ✅ Liste des joueurs proches
+    private List<Player> getNearbyPlayers(double radius) {
+        List<Player> nearbyPlayers = new ArrayList<>();
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            if (!target.equals(player) && target.getWorld().equals(player.getWorld())
+                    && target.getLocation().distance(player.getLocation()) <= radius) {
+                nearbyPlayers.add(target);
+            }
+        }
+        Collections.shuffle(nearbyPlayers);
+        nearbyPlayers = nearbyPlayers.subList(0, Math.min(5, nearbyPlayers.size()));
+        nearbyPlayers.add(player); // Ajoute Gojo à la liste
+        return nearbyPlayers;
+    }
+
+    // ✅ Téléportation dans la Sphère
+    // ✅ Téléportation dans la Sphère avec particules temporaires
+    private void teleportPlayersToSphere(List<Player> players, World gojoWorld, Location spawn) {
+        // ✅ Téléportation de Gojo et des joueurs sélectionnés
+        for (Player target : players) {
+            double randomX = spawn.getX() + (Math.random() * 30) - 15;
+            double randomZ = spawn.getZ() + (Math.random() * 30) - 15;
+            Location teleportLocation = new Location(gojoWorld, randomX, spawn.getY(), randomZ);
+            target.teleport(teleportLocation);
+
+            if (!target.equals(player)) {
+                target.sendMessage("§cVous avez été aspiré dans la Sphère de Gojo !");
+                target.getActivePotionEffects().forEach(effect -> target.removePotionEffect(effect.getType()));
+            } else {
+                player.sendMessage("§bVous êtes entré dans votre Sphère !");
+            }
+        }
+
+        // ✅ Effets visuels de la Sphère avec une tâche qui s'arrête après la téléportation
+        BukkitRunnable particleTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player target : players) {
+                    target.getWorld().spawnParticle(Particle.SPELL_WITCH, target.getLocation(), 75);
+                }
+            }
+        };
+
+        // ✅ Démarrer les particules
+        particleTask.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 20L);
+
+        // ✅ Stopper les particules à la fin de la Sphère
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                particleTask.cancel(); // ❌ Arrête les particules
+            }
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 1200L); // Arrêt des particules après 1 minute
+    }
+
+    // ✅ Retourner les joueurs dans le monde UHC après 1 minute
+    private void returnPlayersToUHC(List<Player> players) {
+        World uhcWorld = Bukkit.getWorld("uhc"); // Remplace "uhc" par le nom de ton monde principal si différent
+        if (uhcWorld == null) {
+            player.sendMessage("§cErreur : Monde UHC introuvable !");
+            return;
+        }
+
+        // ✅ Vérifie la taille de la bordure
+        double borderSize = uhcWorld.getWorldBorder().getSize();
+        Location spawn = uhcWorld.getWorldBorder().getCenter();
+
+        for (Player target : players) {
+            double randomX = spawn.getX() + (Math.random() * borderSize / 2) - (borderSize / 4);
+            double randomZ = spawn.getZ() + (Math.random() * borderSize / 2) - (borderSize / 4);
+            Location safeLocation = new Location(uhcWorld, randomX, uhcWorld.getHighestBlockYAt((int) randomX, (int) randomZ) + 1, randomZ);
+            target.teleport(safeLocation);
+            target.sendMessage("§aVous avez quitté la sphère !");
+        }
+    }
+
+    // ✅ Empêcher les autres joueurs de casser des blocs dans la dimension de Gojo
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player target = event.getPlayer();
+        World world = target.getWorld();
+
+        // ✅ Autorise seulement Gojo à casser des blocs
+        if (world.getName().equals("Gojo") && GameManager.getPlayerRole(target) != RoleType.GOJO) {
+            event.setCancelled(true);
+            target.sendMessage("§c❌ Vous ne pouvez pas casser de blocs dans la Sphère de Gojo !");
+        }
+    }
+
+    // ✅ Empêcher les autres joueurs de poser des blocs dans la dimension de Gojo
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player target = event.getPlayer();
+        World world = target.getWorld();
+
+        // ✅ Autorise seulement Gojo à poser des blocs
+        if (world.getName().equals("Gojo") && GameManager.getPlayerRole(target) != RoleType.GOJO) {
+            event.setCancelled(true);
+            target.sendMessage("§c❌ Vous ne pouvez pas poser de blocs dans la Sphère de Gojo !");
+        }
     }
 }
