@@ -27,6 +27,7 @@ public class Gojo implements Listener {
     private boolean hasUsedMurasaki = false;
     private boolean bandeauOnCooldown = false;
     private long cooldownStartTime = -1;
+    private final Map<UUID, Collection<PotionEffect>> savedEffects = new HashMap<>();
 
     public Gojo(Player player) {
         this.player = player;
@@ -91,8 +92,7 @@ public class Gojo implements Listener {
         player.sendMessage("§a🌟 Vous avez reçu vos pouvoirs et votre bandeau !");
     }
 
-    // ✅ Activation des capacités avec différents clics
-// ✅ Gestion unique des clics
+    // ✅ Gestion unique des clics
     @EventHandler
     public void onAbilityUse(PlayerInteractEvent event) {
         if (!event.getPlayer().equals(player)) return;
@@ -318,10 +318,12 @@ public class Gojo implements Listener {
         return nearbyPlayers;
     }
 
-    // ✅ Téléportation dans la Sphère
-    // ✅ Téléportation dans la Sphère avec particules temporaires
+    // ✅ Téléportation avec suppression des effets avant d'entrer dans la Sphère
     private void teleportPlayersToSphere(List<Player> players, World gojoWorld, Location spawn) {
-        // ✅ Téléportation de Gojo et des joueurs sélectionnés
+        if (!players.contains(player)) {
+            players.add(player);
+        }
+
         for (Player target : players) {
             double randomX = spawn.getX() + (Math.random() * 30) - 15;
             double randomZ = spawn.getZ() + (Math.random() * 30) - 15;
@@ -329,8 +331,8 @@ public class Gojo implements Listener {
             target.teleport(teleportLocation);
 
             if (!target.equals(player)) {
+                storeAndClearEffects(target);
                 target.sendMessage("§cVous avez été aspiré dans la Sphère de Gojo !");
-                target.getActivePotionEffects().forEach(effect -> target.removePotionEffect(effect.getType()));
             } else {
                 player.sendMessage("§bVous êtes entré dans votre Sphère !");
             }
@@ -353,29 +355,32 @@ public class Gojo implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                particleTask.cancel(); // ❌ Arrête les particules
+                particleTask.cancel();
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 1200L); // Arrêt des particules après 1 minute
     }
 
-    // ✅ Retourner les joueurs dans le monde UHC après 1 minute
+    // ✅ Retour dans le monde UHC après 1 minute
     private void returnPlayersToUHC(List<Player> players) {
-        World uhcWorld = Bukkit.getWorld("uhc"); // Remplace "uhc" par le nom de ton monde principal si différent
+        World uhcWorld = Bukkit.getWorld("uhc");
         if (uhcWorld == null) {
             player.sendMessage("§cErreur : Monde UHC introuvable !");
             return;
         }
 
-        // ✅ Vérifie la taille de la bordure
         double borderSize = uhcWorld.getWorldBorder().getSize();
         Location spawn = uhcWorld.getWorldBorder().getCenter();
 
         for (Player target : players) {
             double randomX = spawn.getX() + (Math.random() * borderSize / 2) - (borderSize / 4);
             double randomZ = spawn.getZ() + (Math.random() * borderSize / 2) - (borderSize / 4);
-            Location safeLocation = new Location(uhcWorld, randomX, uhcWorld.getHighestBlockYAt((int) randomX, (int) randomZ) + 1, randomZ);
+            int highestY = uhcWorld.getHighestBlockYAt((int) randomX, (int) randomZ) + 1;
+            Location safeLocation = new Location(uhcWorld, randomX, highestY, randomZ);
+
             target.teleport(safeLocation);
-            target.sendMessage("§aVous avez quitté la sphère !");
+            restorePlayerEffects(target);
+
+            target.sendMessage("§aVous avez quitté la Sphère !");
         }
     }
 
@@ -403,5 +408,20 @@ public class Gojo implements Listener {
             event.setCancelled(true);
             target.sendMessage("§c❌ Vous ne pouvez pas poser de blocs dans la Sphère de Gojo !");
         }
+    }
+
+    // ✅ Stocker et enlever les effets avant la téléportation
+    private void storeAndClearEffects(Player target) {
+        savedEffects.put(target.getUniqueId(), new ArrayList<>(target.getActivePotionEffects()));
+        target.getActivePotionEffects().forEach(effect -> target.removePotionEffect(effect.getType()));
+    }
+
+    // ✅ Restaurer les effets des joueurs après leur retour
+    private void restorePlayerEffects(Player target) {
+        Collection<PotionEffect> effects = savedEffects.getOrDefault(target.getUniqueId(), Collections.emptyList());
+        for (PotionEffect effect : effects) {
+            target.addPotionEffect(effect);
+        }
+        savedEffects.remove(target.getUniqueId());
     }
 }

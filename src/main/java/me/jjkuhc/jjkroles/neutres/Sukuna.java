@@ -15,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -278,6 +280,13 @@ public class Sukuna implements Listener {
 
         Action action = event.getAction();
 
+        // ✅ Priorité au Shift + Clic Droit pour l'Extension de Territoire
+        if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && player.isSneaking()) {
+            activateDomainExpansion();
+            return; // ✅ Empêche d'activer d'autres compétences après l'extension
+        }
+
+        // ✅ Gestion des autres clics
         if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
             useAdvanceAndDamage();
         } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
@@ -495,5 +504,171 @@ public class Sukuna implements Listener {
         }
 
         sukuna.sendMessage("§5☠️ Vous possédez maintenant " + fingerCount + " doigt(s) !");
+    }
+
+    // ✅ Cooldown et état de l'extension
+    private boolean extensionCooldown = false;
+
+    // ✅ Activation de l'Extension de Territoire
+    private void activateDomainExpansion() {
+        if (extensionCooldown) {
+            player.sendMessage("§c⏳ L'extension est encore en cooldown !");
+            return;
+        }
+
+        if (EnergyManager.getEnergy(player) < 1200) {
+            player.sendMessage("§c❌ Pas assez d'énergie occulte !");
+            return;
+        }
+
+        EnergyManager.reduceEnergy(player, 1200);
+        player.sendMessage("§4⛩️ Vous avez activé l'Extension de Territoire : Hôtel Démoniaque !");
+
+        World sukunaWorld = Bukkit.getWorld("Sukuna");
+        if (sukunaWorld == null) {
+            player.sendMessage("§cLe monde 'Sukuna' n'existe pas !");
+            return;
+        }
+
+        Location spawnLocation = sukunaWorld.getSpawnLocation();
+        List<Player> nearbyPlayers = getNearbyPlayers(10);
+        teleportPlayersToDomain(nearbyPlayers, sukunaWorld, spawnLocation);
+
+        player.sendMessage("§4Les joueurs ont été aspirés dans l'Hôtel Démoniaque !");
+
+        // ✅ Lancer le cooldown de 10 minutes
+        extensionCooldown = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                extensionCooldown = false;
+                player.sendMessage("§a🌀 Votre Extension de Territoire est à nouveau disponible !");
+            }
+        }.runTaskLater(plugin, 12000L); // 10 minutes = 12000 ticks
+
+        // ✅ Retour des joueurs au bout d'1 minute
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                returnPlayersToUHC(nearbyPlayers);
+            }
+        }.runTaskLater(plugin, 1200L); // 1 minute = 1200 ticks
+    }
+
+    // ✅ Obtenir les joueurs proches
+    private List<Player> getNearbyPlayers(double radius) {
+        List<Player> nearbyPlayers = new ArrayList<>();
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            if (!target.equals(player) && target.getWorld().equals(player.getWorld())
+                    && target.getLocation().distance(player.getLocation()) <= radius) {
+                nearbyPlayers.add(target);
+            }
+        }
+        return nearbyPlayers;
+    }
+
+    // ✅ Téléportation dans l'extension
+    private void teleportPlayersToDomain(List<Player> players, World domainWorld, Location spawn) {
+        if (!players.contains(player)) {
+            players.add(player);
+        }
+
+        for (Player target : players) {
+            double randomX = spawn.getX() + (Math.random() * 30) - 15;
+            double randomZ = spawn.getZ() + (Math.random() * 30) - 15;
+            Location teleportLocation = new Location(domainWorld, randomX, 128, randomZ);
+            target.teleport(teleportLocation);
+
+            if (!target.equals(player)) {
+                storeAndClearEffects(target); // ✅ Sauvegarde et suppression des effets
+                target.sendMessage("§4Vous avez été aspiré dans l'Extension de Sukuna !");
+            } else {
+                player.sendMessage("§cVous êtes dans votre Hôtel Démoniaque !");
+            }
+        }
+    }
+
+    // ✅ Retour dans le monde UHC après 1 minute
+    private void returnPlayersToUHC(List<Player> players) {
+        World uhcWorld = Bukkit.getWorld("uhc");
+        if (uhcWorld == null) {
+            player.sendMessage("§cErreur : Monde UHC introuvable !");
+            return;
+        }
+
+        double borderSize = uhcWorld.getWorldBorder().getSize();
+        Location spawn = uhcWorld.getWorldBorder().getCenter();
+
+        for (Player target : players) {
+            double randomX = spawn.getX() + (Math.random() * borderSize / 2) - (borderSize / 4);
+            double randomZ = spawn.getZ() + (Math.random() * borderSize / 2) - (borderSize / 4);
+            int highestY = uhcWorld.getHighestBlockYAt((int) randomX, (int) randomZ) + 1;
+            Location safeLocation = new Location(uhcWorld, randomX, highestY, randomZ);
+
+            target.teleport(safeLocation);
+            restorePlayerEffects(target);
+
+            target.sendMessage("§aVous avez quitté l'extension de Sukuna !");
+        }
+    }
+
+    // ✅ Activation avec Shift + Clic Droit sur la Nether Star
+    @EventHandler
+    public void onDomainExpansionActivate(PlayerInteractEvent event) {
+        if (!event.getPlayer().equals(player)) return;
+
+        ItemStack item = event.getItem();
+        if (item == null || item.getType() != Material.NETHER_STAR) return;
+        if (!item.getItemMeta().getDisplayName().equals("§cSorts Innés de Sukuna")) return;
+
+        Action action = event.getAction();
+
+        if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && player.isSneaking()) {
+            activateDomainExpansion();
+        }
+    }
+
+    // ✅ Stocker les effets des joueurs avant d'entrer dans l'extension
+    private final Map<UUID, Collection<PotionEffect>> savedEffects = new HashMap<>();
+
+    // ✅ Stocker et enlever les effets avant la téléportation
+    private void storeAndClearEffects(Player target) {
+        savedEffects.put(target.getUniqueId(), new ArrayList<>(target.getActivePotionEffects()));
+        target.getActivePotionEffects().forEach(effect -> target.removePotionEffect(effect.getType()));
+    }
+
+    // ✅ Restauration des effets des joueurs à leur retour
+    private void restorePlayerEffects(Player target) {
+        Collection<PotionEffect> effects = savedEffects.getOrDefault(target.getUniqueId(), Collections.emptyList());
+        for (PotionEffect effect : effects) {
+            target.addPotionEffect(effect);
+        }
+        savedEffects.remove(target.getUniqueId());
+    }
+
+    // ✅ Empêcher les autres joueurs de casser des blocs dans la dimension de Sukuna
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player target = event.getPlayer();
+        World world = target.getWorld();
+
+        // ✅ Autorise seulement Sukuna à casser des blocs
+        if (world.getName().equals("Sukuna") && GameManager.getPlayerRole(target) != RoleType.SUKUNA) {
+            event.setCancelled(true);
+            target.sendMessage("§c❌ Vous ne pouvez pas casser de blocs !");
+        }
+    }
+
+    // ✅ Empêcher les autres joueurs de poser des blocs dans la dimension de Sukuna
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player target = event.getPlayer();
+        World world = target.getWorld();
+
+        // ✅ Autorise seulement Sukuna à poser des blocs
+        if (world.getName().equals("Sukuna") && GameManager.getPlayerRole(target) != RoleType.SUKUNA) {
+            event.setCancelled(true);
+            target.sendMessage("§c❌ Vous ne pouvez pas poser de blocs !");
+        }
     }
 }

@@ -128,4 +128,5 @@ public class GameManager {
             player.sendMessage("§5⚡ Vous avez reçu un doigt de Sukuna !");
         }
     }
+
 }

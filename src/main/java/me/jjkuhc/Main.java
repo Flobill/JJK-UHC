@@ -40,6 +40,7 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new TimerConfigMenu(), this);
         getServer().getPluginManager().registerEvents(new SukunaFingerMenu(), this);
 
+        //Les commandes
         getCommand("jjk").setExecutor(new me.jjkuhc.commands.JJKCommand());
         getCommand("spawn").setExecutor(new CompassCommand(this));
         getCommand("jump").setExecutor(new CompassCommand(this));
