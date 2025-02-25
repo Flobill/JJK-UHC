@@ -280,13 +280,13 @@ public class Sukuna implements Listener {
 
         Action action = event.getAction();
 
-        // ✅ Priorité au Shift + Clic Droit pour l'Extension de Territoire
+        // ✅ Priorité à l'extension si Shift + clic droit
         if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && player.isSneaking()) {
-            activateDomainExpansion();
-            return; // ✅ Empêche d'activer d'autres compétences après l'extension
+            activateDomainExpansion(); // Active uniquement l'extension
+            return; // ❌ Empêche d'autres capacités de s'activer
         }
 
-        // ✅ Gestion des autres clics
+        // ✅ Si pas en sneaky, activer les autres capacités
         if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
             useAdvanceAndDamage();
         } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
