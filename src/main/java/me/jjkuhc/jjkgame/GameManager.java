@@ -1,14 +1,19 @@
 package me.jjkuhc.jjkgame;
 
+import me.jjkuhc.jjkconfig.PacteMenu;
 import me.jjkuhc.jjkconfig.SukunaFingerMenu;
 import me.jjkuhc.jjkconfig.TimerConfigMenu;
 import me.jjkuhc.jjkroles.CampManager;
 import me.jjkuhc.jjkroles.CampType;
 import me.jjkuhc.jjkroles.RoleType;
 import me.jjkuhc.jjkroles.exorcistes.Gojo;
+import me.jjkuhc.jjkroles.exorcistes.Itadori;
 import me.jjkuhc.jjkroles.neutres.Sukuna;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.inventory.ItemStack;
@@ -101,6 +106,10 @@ public class GameManager {
                             Sukuna sukuna = new Sukuna(player, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                             Bukkit.getServer().getPluginManager().registerEvents(sukuna, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
+                        if (role == RoleType.ITADORI) {
+                            Itadori itadori = new Itadori(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(itadori, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
                     }
                 }
 
@@ -126,6 +135,101 @@ public class GameManager {
             ItemStack sukunaFinger = new ItemStack(Material.NETHER_WART);
             player.getInventory().addItem(sukunaFinger);
             player.sendMessage("§5⚡ Vous avez reçu un doigt de Sukuna !");
+        }
+    }
+
+    // ✅ Appliquer Résistance I la nuit pour Yuji (Pacte Coopératif)
+    public static void applyNightResistance(Player player) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (GameManager.getPlayerRole(player) == RoleType.ITADORI &&
+                        PacteMenu.getPacte(player).equals("Cooperation")) {
+                    if (isNight(player.getWorld())) {
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 600, 0, false, false));
+                    }
+                }
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 600L); // Vérifie toutes les 30s
+    }
+
+    // ✅ Détecter si c'est la nuit
+    private static boolean isNight(World world) {
+        long time = world.getTime();
+        return time >= 13000 && time <= 23000;
+    }
+
+    public static Player getSukunaPlayer() {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (getPlayerRole(onlinePlayer) == RoleType.SUKUNA) {
+                return onlinePlayer;
+            }
+        }
+        return null; // Retourne null si Sukuna est mort ou n'existe pas
+    }
+
+    public static void setFingersToSukuna(Player player) {
+        Player sukuna = getSukunaPlayer();
+        if (sukuna == null) {
+            player.sendMessage("§cErreur : Sukuna n'existe pas ou est mort.");
+            return;
+        }
+
+        // Vérifie si Itadori a des doigts
+        List<ItemStack> fingersToGive = new ArrayList<>();
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.NETHER_WART) {
+                fingersToGive.add(item);
+            }
+        }
+
+        if (fingersToGive.isEmpty()) {
+            player.sendMessage("§cVous ne possédez aucun doigt de Sukuna !");
+            return;
+        }
+
+        // Transfert des doigts à Sukuna
+        for (ItemStack finger : fingersToGive) {
+            player.getInventory().remove(finger);
+            sukuna.getInventory().addItem(finger);
+        }
+
+        player.sendMessage("§5⚡ Tous vos doigts ont été donnés à Sukuna !");
+        sukuna.sendMessage("§4🔥 Vous avez reçu les doigts d'Itadori !");
+    }
+
+    // ✅ Assigner la liste avec Sukuna pour le Pacte d'Ignorance
+    public static void assignIgnoranceList(Player yuji) {
+        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        players.remove(yuji); // Enlever Itadori de la liste
+        Collections.shuffle(players);
+
+        // ✅ Vérifier qu'il y a suffisamment de joueurs pour éviter les doublons
+        List<Player> selected = new ArrayList<>();
+        int maxPlayers = Math.min(4, players.size());
+        selected.addAll(players.subList(0, maxPlayers));
+
+        Player sukuna = GameManager.getSukunaPlayer();
+        if (sukuna != null && !selected.contains(sukuna)) {
+            selected.add(sukuna); // Ajoute Sukuna une seule fois
+        }
+
+        yuji.sendMessage("§6📜 Joueurs suspectés d'être Sukuna :");
+        for (Player p : selected) {
+            yuji.sendMessage(" - §b" + p.getName());
+        }
+    }
+
+    public static void handleEpisodeStart() {
+        Bukkit.broadcastMessage("§e🌟 Début d'un nouvel épisode !");
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            RoleType role = GameManager.getPlayerRole(player);
+
+            // ✅ Vérifie si le joueur est Itadori et applique son passif
+            if (role == RoleType.ITADORI) {
+                Itadori.checkAndApplyRegeneration(player);
+            }
         }
     }
 

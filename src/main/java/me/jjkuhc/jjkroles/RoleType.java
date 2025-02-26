@@ -2,12 +2,14 @@ package me.jjkuhc.jjkroles;
 
 public enum RoleType {
     GOJO(CampType.EXORCISTES, "Gojo"),
+    ITADORI(CampType.EXORCISTES, "Itadori"),
+    MEGUMI(CampType.EXORCISTES, "Megumi"),
+    JOGO(CampType.NEUTRES, "Jogo"),
     SUKUNA(CampType.NEUTRES, "Sukuna"),
-    MEGUMI(CampType.FLEAUX, "Megumi"),
+    TOJI(CampType.NEUTRES, "Toji"),
     YUTA(CampType.YUTA_RIKA, "Yuta Okkotsu"),
     RIKA(CampType.YUTA_RIKA, "Rika Orimoto"),
-    TOJI(CampType.NEUTRES, "Toji"),
-    JOGO(CampType.NEUTRES, "Jogo"),
+
     EXORCISTE_BASIQUE(CampType.EXORCISTES, "Exorciste Basique"); // Par défaut exorciste
 
     private final CampType camp;

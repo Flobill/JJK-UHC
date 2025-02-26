@@ -121,7 +121,7 @@ public class RoleConfigMenu implements Listener {
 
     private CampType getCampForRole(RoleType role) {
         return switch (role) {
-            case GOJO, MEGUMI -> CampType.EXORCISTES;
+            case GOJO, ITADORI, MEGUMI -> CampType.EXORCISTES;
             case JOGO -> CampType.FLEAUX;
             case TOJI, SUKUNA -> CampType.NEUTRES;
             case YUTA, RIKA -> CampType.YUTA_RIKA;

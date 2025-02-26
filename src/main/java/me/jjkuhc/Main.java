@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class Main extends JavaPlugin implements Listener {
@@ -39,6 +40,7 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new StartGameMenu(), this);
         getServer().getPluginManager().registerEvents(new TimerConfigMenu(), this);
         getServer().getPluginManager().registerEvents(new SukunaFingerMenu(), this);
+        getServer().getPluginManager().registerEvents(new PacteMenu(), this);
 
         //Les commandes
         getCommand("jjk").setExecutor(new me.jjkuhc.commands.JJKCommand());
@@ -60,6 +62,13 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new RoleConfigMenu(), this);
         getServer().getPluginManager().registerEvents(new CampRoleMenu(), this);
         getServer().getPluginManager().registerEvents(new SukunaFingerListener(), this);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                GameManager.handleEpisodeStart();
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 14400L); // 12 minutes
 
     }
 

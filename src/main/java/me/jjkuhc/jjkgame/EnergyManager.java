@@ -1,5 +1,6 @@
 package me.jjkuhc.jjkgame;
 
+import me.jjkuhc.jjkroles.RoleType;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -73,5 +74,28 @@ public class EnergyManager implements CommandExecutor {
         }
 
         return true;
+    }
+
+    public static void handleEnergyGain(Player attacker, Player target, boolean isCritical) {
+        int baseGain = 4;
+        int energyGain = baseGain;
+
+        // ✅ Appliquer le bonus *2 seulement pour Itadori en coup critique
+        if (GameManager.getPlayerRole(attacker) == RoleType.ITADORI && isCritical) {
+            energyGain *= 2; // 8 énergie au lieu de 4
+        }
+
+        // ✅ Vérifie que l'on ne dépasse pas la limite max d'Itadori
+        if (GameManager.getPlayerRole(attacker) == RoleType.ITADORI) {
+            int currentEnergy = getEnergy(attacker);
+            if (currentEnergy + energyGain > 800) {
+                energyGain = 800 - currentEnergy; // Limite à 800
+            }
+        }
+
+        // ✅ Ajoute l’énergie si elle est positive
+        if (energyGain > 0) {
+            addEnergy(attacker, energyGain);
+        }
     }
 }

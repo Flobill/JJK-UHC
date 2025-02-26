@@ -1,5 +1,7 @@
 package me.jjkuhc.jjkgame;
 
+import me.jjkuhc.jjkconfig.PacteMenu;
+import me.jjkuhc.jjkroles.RoleType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -46,8 +48,10 @@ public class SukunaFingerListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
+
         Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), () -> {
             updateSukunaHearts(player);
+            transferFingersToSukuna(player);
         }, 1L);
     }
 
@@ -55,9 +59,12 @@ public class SukunaFingerListener implements Listener {
     @EventHandler
     public void onItemPickup(PlayerPickupItemEvent event) {
         Player player = event.getPlayer();
-        if (event.getItem().getItemStack().getType() == Material.NETHER_WART) {
+        ItemStack item = event.getItem().getItemStack();
+
+        if (item.getType() == Material.NETHER_WART) {
             Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), () -> {
                 updateSukunaHearts(player);
+                transferFingersToSukuna(player); // ✅ Vérifie si Itadori doit transférer les doigts
             }, 1L);
         }
     }
@@ -75,5 +82,31 @@ public class SukunaFingerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         updateSukunaHearts(event.getPlayer());
+    }
+
+    private void transferFingersToSukuna(Player itadori) {
+        // ✅ Vérifie si Itadori a accepté le pacte Coopératif
+        if (GameManager.getPlayerRole(itadori) == RoleType.ITADORI &&
+                PacteMenu.getPacte(itadori).equals("Cooperation")) {
+
+            Player sukuna = GameManager.getSukunaPlayer();
+            if (sukuna == null) return;
+
+            int amount = 0;
+            for (ItemStack item : itadori.getInventory().getContents()) {
+                if (item != null && item.getType() == Material.NETHER_WART) {
+                    amount += item.getAmount();
+                    itadori.getInventory().remove(item); // ✅ Supprime les doigts
+                }
+            }
+
+            if (amount > 0) {
+                ItemStack sukunaFingers = new ItemStack(Material.NETHER_WART, amount);
+                sukuna.getInventory().addItem(sukunaFingers);
+
+                itadori.sendMessage("§5⚡ Tous vos doigts ont été envoyés à Sukuna !");
+                sukuna.sendMessage("§4⚡ Vous avez reçu " + amount + " doigt(s) d'Itadori !");
+            }
+        }
     }
 }
