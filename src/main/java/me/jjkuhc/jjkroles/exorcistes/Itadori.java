@@ -146,17 +146,32 @@ public class Itadori implements Listener {
     @EventHandler
     public void onPlayerAttack(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player)) return;
-        Player attacker = (Player) event.getDamager();
+        if (!(event.getEntity() instanceof Player)) return; // ✅ Vérifie que la cible est un joueur
 
+        Player attacker = (Player) event.getDamager();
+        Player target = (Player) event.getEntity();
+
+        // ✅ Vérifie que c'est bien Itadori qui attaque
         if (!attacker.equals(player)) return;
         if (!hasBlackFlashActive) return;
 
         // ✅ Vérifie qu'Itadori utilise bien une épée
         ItemStack weapon = attacker.getInventory().getItemInMainHand();
-        if (weapon.getType().name().contains("SWORD")) {
-            event.setDamage(event.getDamage() + 2.0); // ✅ +1 cœur (2 points de dégâts)
-            hasBlackFlashActive = false; // ✅ Désactive Éclair Noir après le coup
+        if (weapon.getType().toString().contains("SWORD")) {
+            double baseDamage = event.getDamage();
+            double bonusDamage = 4.0; // ✅ +1 cœur (2 points de dégâts)
+            double newDamage = baseDamage + bonusDamage * 1.5;
+
+            event.setDamage(newDamage);
+
+            // ✅ Messages de debug
             attacker.sendMessage("§6💥 Éclair Noir déclenché ! Dégâts bonus appliqués.");
+            target.sendMessage("§c⚡ Vous avez été touché par un Éclair Noir !");
+
+            // ✅ Désactive Éclair Noir après le coup
+            hasBlackFlashActive = false;
+        } else {
+            attacker.sendMessage("§c⚠ Éclair Noir ne peut être activé qu'avec une épée !");
         }
     }
 
@@ -214,8 +229,6 @@ public class Itadori implements Listener {
             double damage = event.getDamage();
             double increasedDamage = damage * 1.1; // +10%
             event.setDamage(increasedDamage);
-
-            attacker.sendMessage("§6⚡ Votre coup contre Sukuna est amplifié de 10% !");
         }
     }
 }
