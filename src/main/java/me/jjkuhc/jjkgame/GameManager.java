@@ -8,6 +8,7 @@ import me.jjkuhc.jjkroles.CampType;
 import me.jjkuhc.jjkroles.RoleType;
 import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.jjkroles.exorcistes.Itadori;
+import me.jjkuhc.jjkroles.exorcistes.Megumi;
 import me.jjkuhc.jjkroles.neutres.Sukuna;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -109,6 +110,10 @@ public class GameManager {
                         if (role == RoleType.ITADORI) {
                             Itadori itadori = new Itadori(player);
                             Bukkit.getServer().getPluginManager().registerEvents(itadori, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
+                        if (role == RoleType.MEGUMI) {
+                            Megumi megumi = new Megumi(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(megumi, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
                     }
                 }
