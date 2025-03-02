@@ -13,11 +13,19 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
+import me.jjkuhc.jjkroles.exorcistes.Nobara;
 
 public class SukunaFingerListener implements Listener {
 
     // ✅ Vérifie si le joueur a encore des doigts de Sukuna
     private void updateSukunaHearts(Player player) {
+        RoleType role = GameManager.getPlayerRole(player);
+
+        // ✅ Vérifier si le joueur est Nobara et qu'elle a activé le partage des douleurs
+        if (role == RoleType.NOBARA && me.jjkuhc.jjkroles.exorcistes.Nobara.partageDouleurMap.containsKey(player.getUniqueId())) {
+            return; // ❌ Nobara ne gagne pas de cœurs si elle est liée à quelqu'un
+        }
+
         int fingerCount = 0;
 
         // ✅ Compter les doigts dans l'inventaire

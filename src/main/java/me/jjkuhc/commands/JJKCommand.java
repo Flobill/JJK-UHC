@@ -6,6 +6,7 @@ import me.jjkuhc.jjkconfig.PacteMenu;
 import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkgame.GameState;
 import me.jjkuhc.jjkroles.RoleType;
+import me.jjkuhc.jjkroles.exorcistes.Nobara;
 import me.jjkuhc.jjkroles.neutres.Sukuna; // Import pour appeler la commande de Sukuna
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -58,6 +59,48 @@ public class JJKCommand implements CommandExecutor {
                     player.sendMessage("§cVous ne pouvez pas faire de pacte avant le début de la partie !");
                     return true;
                 }
+            case "nobara":
+                if (args.length < 2) {
+                    player.sendMessage("§c❌ Utilisation correcte : /jjk nobara <joueur>");
+                    return true;
+                }
+
+                if (GameManager.getPlayerRole(player) != RoleType.NOBARA) {
+                    player.sendMessage("§c❌ Seule Nobara Kugisaki peut utiliser cette commande !");
+                    return true;
+                }
+
+                Player cible = player.getServer().getPlayer(args[1]);
+                if (cible == null) {
+                    player.sendMessage("§c❌ Ce joueur n'est pas en ligne !");
+                    return true;
+                }
+
+                Nobara nobara = new Nobara(player);
+                nobara.activerPartageDouleurs(player, cible);
+                return true;
+
+            case "clou":
+                if (args.length < 2) {
+                    player.sendMessage("§c❌ Utilisation correcte : /jjk clou <joueur>");
+                    return true;
+                }
+
+                // Vérifier si le joueur a le rôle de Nobara
+                if (GameManager.getPlayerRole(player) != RoleType.NOBARA) {
+                    player.sendMessage("§c❌ Seule Nobara Kugisaki peut utiliser cette commande !");
+                    return true;
+                }
+
+                Player target = player.getServer().getPlayer(args[1]);
+                if (target == null) {
+                    player.sendMessage("§c❌ Ce joueur n'est pas en ligne !");
+                    return true;
+                }
+
+                // Appel de la fonction pour poser le clou
+                Nobara.poserClou(player, target);
+                return true;
 
             default:
                 player.sendMessage("§cCommande inconnue. Utilisation : /jjk <config|sethost|recuperer>");

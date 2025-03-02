@@ -9,6 +9,7 @@ import me.jjkuhc.jjkroles.RoleType;
 import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.jjkroles.exorcistes.Itadori;
 import me.jjkuhc.jjkroles.exorcistes.Megumi;
+import me.jjkuhc.jjkroles.exorcistes.Nobara;
 import me.jjkuhc.jjkroles.neutres.Sukuna;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -115,6 +116,10 @@ public class GameManager {
                             Megumi megumi = new Megumi(player);
                             Bukkit.getServer().getPluginManager().registerEvents(megumi, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
+                        if (role == RoleType.NOBARA) {
+                            Nobara nobara = new Nobara(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(nobara, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
                     }
                 }
 
@@ -129,6 +134,11 @@ public class GameManager {
 
     public static RoleType getPlayerRole(Player player) {
         return playerRoles.getOrDefault(player.getUniqueId(), RoleType.EXORCISTE_BASIQUE);
+    }
+
+    public static CampType getPlayerCamp(Player player) {
+        RoleType role = getPlayerRole(player); // Récupère le rôle du joueur
+        return role.getCamp(); // Retourne son camp
     }
 
     private static void distributeSukunaFingers(int numberOfFingers) {
