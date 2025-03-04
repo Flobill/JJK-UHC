@@ -10,6 +10,7 @@ import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.jjkroles.exorcistes.Itadori;
 import me.jjkuhc.jjkroles.exorcistes.Megumi;
 import me.jjkuhc.jjkroles.exorcistes.Nobara;
+import me.jjkuhc.jjkroles.fleaux.Jogo;
 import me.jjkuhc.jjkroles.neutres.Sukuna;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -119,6 +120,10 @@ public class GameManager {
                         if (role == RoleType.NOBARA) {
                             Nobara nobara = new Nobara(player);
                             Bukkit.getServer().getPluginManager().registerEvents(nobara, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
+                        if (role == RoleType.JOGO) {
+                            Jogo jogo = new Jogo(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(jogo, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
                     }
                 }

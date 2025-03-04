@@ -28,9 +28,9 @@ public class Main extends JavaPlugin implements Listener {
         saveDefaultConfig(); // Pour créer le fichier config.yml s'il n'existe pas encore
 
         // Charger les timers depuis la configuration
-        int pvpTimer = getConfig().getInt("timers.pvp", 300); // 600s = 5 min par défaut
-        int invincibilityTimer = getConfig().getInt("timers.invincibility", 90); // 120s = 1min30 par défaut
-        int roleAnnouncementTimer = getConfig().getInt("timers.role_announcement", 120);
+        int pvpTimer = getConfig().getInt("timers.pvp", 10);
+        int invincibilityTimer = getConfig().getInt("timers.invincibility", 10);
+        int roleAnnouncementTimer = getConfig().getInt("timers.role_announcement", 5);
 
 
         scoreboardManager = new ScoreboardManager(this);
@@ -100,7 +100,6 @@ public class Main extends JavaPlugin implements Listener {
             if (GameManager.getCurrentState() == GameState.EN_COURS) {
                 event.setCancelled(false);
             } else {
-                Bukkit.getLogger().info("[DEBUG] Dégâts annulés car la partie n'est pas en cours.");
                 event.setCancelled(true);
             }
         }
