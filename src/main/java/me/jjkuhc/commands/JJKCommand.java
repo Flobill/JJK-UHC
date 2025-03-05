@@ -7,6 +7,7 @@ import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkgame.GameState;
 import me.jjkuhc.jjkroles.RoleType;
 import me.jjkuhc.jjkroles.exorcistes.Nobara;
+import me.jjkuhc.jjkroles.fleaux.Hanami;
 import me.jjkuhc.jjkroles.neutres.Sukuna; // Import pour appeler la commande de Sukuna
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -100,6 +101,29 @@ public class JJKCommand implements CommandExecutor {
 
                 // Appel de la fonction pour poser le clou
                 Nobara.poserClou(player, target);
+                return true;
+
+            case "bourgeon":
+                if (args.length < 2) {
+                    player.sendMessage("§c❌ Utilisation correcte : /jjk bourgeon <joueur>");
+                    return true;
+                }
+
+                // Vérifier si le joueur a le rôle Hanami
+                if (GameManager.getPlayerRole(player) != RoleType.HANAMI) {
+                    player.sendMessage("§c❌ Seul Hanami peut utiliser cette commande !");
+                    return true;
+                }
+
+                Player cibleBourgeon = player.getServer().getPlayer(args[1]);
+                if (cibleBourgeon == null) {
+                    player.sendMessage("§c❌ Ce joueur n'est pas en ligne !");
+                    return true;
+                }
+
+                // Appel de la fonction utiliserBourgeon dans Hanami
+                Hanami hanami = new Hanami(player);
+                hanami.utiliserBourgeon(cibleBourgeon);
                 return true;
 
             default:

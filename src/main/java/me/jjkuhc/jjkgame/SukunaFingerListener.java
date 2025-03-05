@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import me.jjkuhc.jjkroles.exorcistes.Nobara;
+import me.jjkuhc.jjkroles.fleaux.Hanami;
 
 public class SukunaFingerListener implements Listener {
 
@@ -21,26 +21,26 @@ public class SukunaFingerListener implements Listener {
     private void updateSukunaHearts(Player player) {
         RoleType role = GameManager.getPlayerRole(player);
 
-        // ✅ Vérifier si le joueur est Nobara et qu'elle a activé le partage des douleurs
         if (role == RoleType.NOBARA && me.jjkuhc.jjkroles.exorcistes.Nobara.partageDouleurMap.containsKey(player.getUniqueId())) {
-            return; // ❌ Nobara ne gagne pas de cœurs si elle est liée à quelqu'un
+            return;
         }
 
         int fingerCount = 0;
-
-        // ✅ Compter les doigts dans l'inventaire
         for (ItemStack item : player.getInventory().getContents()) {
             if (item != null && item.getType() == Material.NETHER_WART) {
                 fingerCount += item.getAmount();
             }
         }
 
-        // ✅ Mise à jour des cœurs supplémentaires
-        double baseHealth = 20.0; // 10 cœurs de base
-        double extraHealth = baseHealth + (fingerCount * 2); // Chaque doigt donne 1 cœur = 2 points de vie
+        double baseHealth = 20.0;
+        double extraHealth = baseHealth + (fingerCount * 2);
 
-        if (player.getMaxHealth() != extraHealth) {
-            player.setMaxHealth(extraHealth);
+        // Vérifier si le joueur est maudit par Bourgeon
+        double bourgeonReduction = Hanami.getCoeursPerdus(player);
+        double finalHealth = Math.max(4.0, extraHealth - bourgeonReduction);
+
+        if (player.getMaxHealth() != finalHealth) {
+            player.setMaxHealth(finalHealth);
         }
     }
 

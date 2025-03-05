@@ -10,6 +10,7 @@ import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.jjkroles.exorcistes.Itadori;
 import me.jjkuhc.jjkroles.exorcistes.Megumi;
 import me.jjkuhc.jjkroles.exorcistes.Nobara;
+import me.jjkuhc.jjkroles.fleaux.Hanami;
 import me.jjkuhc.jjkroles.fleaux.Jogo;
 import me.jjkuhc.jjkroles.neutres.Sukuna;
 import org.bukkit.Bukkit;
@@ -21,8 +22,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
-import org.bukkit.inventory.meta.ItemMeta;
-import me.jjkuhc.jjkconfig.SukunaFingerMenu;
 
 import java.util.*;
 
@@ -124,6 +123,10 @@ public class GameManager {
                         if (role == RoleType.JOGO) {
                             Jogo jogo = new Jogo(player);
                             Bukkit.getServer().getPluginManager().registerEvents(jogo, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
+                        if (role == RoleType.HANAMI) {
+                            Hanami hanami = new Hanami(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(hanami, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
                     }
                 }

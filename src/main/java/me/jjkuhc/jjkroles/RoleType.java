@@ -6,6 +6,7 @@ public enum RoleType {
     MEGUMI(CampType.EXORCISTES, "Megumi"),
     NOBARA(CampType.EXORCISTES, "Nobara"),
     JOGO(CampType.FLEAUX, "Jogo"),
+    HANAMI(CampType.FLEAUX, "Hanami"),
     SUKUNA(CampType.NEUTRES, "Sukuna"),
     TOJI(CampType.NEUTRES, "Toji"),
     YUTA(CampType.YUTA_RIKA, "Yuta Okkotsu"),
