@@ -34,9 +34,9 @@ public class Nobara implements Listener {
     private static final int MAX_ENERGIE_OCCULTE = 600;
     private static final int EXPLOSION_CLOU_COST = 400;
     private BukkitTask actionBarTask;
-    private boolean partageActif = false; // ✅ Savoir si le partage est actif
-    private UUID ciblePartageID = null; // ✅ Stocker le joueur ciblé par le partage
-    private static final int PARTAGE_COUT = 400; // ✅ Coût en énergie occulte
+    private boolean partageActif = false;
+    private UUID ciblePartageID = null;
+    private static final int PARTAGE_COUT = 400;
 
     private static final HashMap<UUID, UUID> clousMarques = new HashMap<>();
     private static final HashMap<UUID, Long> cooldownsClou = new HashMap<>();
@@ -48,6 +48,7 @@ public class Nobara implements Listener {
         if (player != null && player.isOnline()) {
             EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
             donnerPochetteDeClous();
+            donnerClousDepart();
         }
     }
 
@@ -75,7 +76,11 @@ public class Nobara implements Listener {
         }
 
         // ✅ Applique le coût et pose le clou
-        EnergyManager.reduceEnergy(nobara, CLOU_COST);
+        if (!retirerClou(nobara)) {
+            nobara.sendMessage(ChatColor.RED + "❌ Vous n'avez plus de clous !");
+            return;
+        }
+
         clousMarques.put(nobaraID, cibleID);
         cooldownsClou.put(nobaraID, System.currentTimeMillis() + (CLOU_COOLDOWN * 1000));
 
@@ -107,6 +112,7 @@ public class Nobara implements Listener {
                     } else {
                         nobara.sendMessage(ChatColor.GREEN + "✔ " + cible.getName() + " n'est PAS un fléau.");
                     }
+                    clousMarques.remove(nobaraID);
                 }
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), CLOU_DURATION_DAMAGE * 20L);
@@ -172,17 +178,10 @@ public class Nobara implements Listener {
         // ✅ Nobara gagne 5 minutes de Résistance 1
         nobara.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 6000, 0)); // 5 minutes = 6000 ticks
 
-        // ✅ Nobara récupère un clou dans son inventaire
-        ItemStack clouItem = new ItemStack(Material.IRON_NUGGET); // Un item qui représente le clou
-        ItemMeta meta = clouItem.getItemMeta();
-        meta.setDisplayName(ChatColor.GOLD + "🧶 Clou Maudit");
-        clouItem.setItemMeta(meta);
-        nobara.getInventory().addItem(clouItem);
-
         // ✅ Effet sonore et visuel
         cible.getWorld().playSound(cible.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
         cible.sendMessage(ChatColor.DARK_RED + "💥 Un clou maudit explose sur vous, infligeant 3 cœurs !");
-        nobara.sendMessage(ChatColor.GOLD + "🧶 Vous avez explosé un clou et récupéré un autre !");
+        nobara.sendMessage(ChatColor.GOLD + "🧶 Vous avez explosé un clou !");
     }
 
     @EventHandler
@@ -312,10 +311,19 @@ public class Nobara implements Listener {
 
         double damage = event.getFinalDamage();
         Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("JJKUHC"), () -> {
-            if (cible.getHealth() > 1) {
-                cible.damage(damage);
-                cible.sendMessage(ChatColor.RED + "💀 Vous ressentez la douleur de Nobara !");
-            }
+            Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("JJKUHC"), () -> {
+                if (cible.isOnline()) {
+                    double cibleHealth = cible.getHealth();
+
+                    double maxDamage = cibleHealth - 1;
+
+                    if (maxDamage > 0) {
+                        double finalDamage = Math.min(damage, maxDamage);
+                        cible.damage(finalDamage);
+                        cible.sendMessage(ChatColor.RED + "💀 Vous ressentez la douleur de Nobara !");
+                    }
+                }
+            });
         });
     }
 
@@ -340,5 +348,49 @@ public class Nobara implements Listener {
             });
         }
         partageDouleurMap.remove(nobaraID);
+    }
+
+    private static boolean retirerClou(Player nobara) {
+        ItemStack[] contents = nobara.getInventory().getContents();
+
+        for (ItemStack item : contents) {
+            if (item != null && item.getType() == Material.IRON_NUGGET) {
+                if (item.getAmount() > 1) {
+                    item.setAmount(item.getAmount() - 1);
+                } else {
+                    nobara.getInventory().remove(item);
+                }
+                return true; // ✅ Clou retiré avec succès
+            }
+        }
+        return false; // ❌ Aucun clou à retirer
+    }
+
+    private void donnerClousDepart() {
+        int clousExistants = 0;
+
+        // Vérifier combien de clous Nobara possède déjà
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.IRON_NUGGET) {
+                clousExistants += item.getAmount();
+            }
+        }
+
+        // Si elle n'a pas encore ses 4 clous, lui en donner
+        if (clousExistants < 4) {
+            ItemStack clous = new ItemStack(Material.IRON_NUGGET, 4 - clousExistants);
+            ItemMeta meta = clous.getItemMeta();
+            meta.setDisplayName(ChatColor.GOLD + "🧶 Clou Maudit");
+            clous.setItemMeta(meta);
+            player.getInventory().addItem(clous);
+        }
+    }
+
+    private void ajouterClou(Player nobara) {
+        ItemStack clou = new ItemStack(Material.IRON_NUGGET, 1);
+        ItemMeta meta = clou.getItemMeta();
+        meta.setDisplayName(ChatColor.GOLD + "🧶 Clou Maudit");
+        clou.setItemMeta(meta);
+        nobara.getInventory().addItem(clou);
     }
 }

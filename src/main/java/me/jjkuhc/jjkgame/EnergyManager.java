@@ -10,14 +10,12 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class EnergyManager implements CommandExecutor {
     private static final HashMap<UUID, Integer> energyMap = new HashMap<>();
     private static final HashMap<UUID, Integer> maxEnergyMap = new HashMap<>(); // Ajout de l'énergie max
     private static final HashMap<UUID, Long> blockedPlayers = new HashMap<>(); // Gestion du blocage des capacités
     private static final int DEFAULT_ENERGY = 200;
-    private static final HashMap<UUID, Consumer<Player>> energyUsageListeners = new HashMap<>();
 
     // Initialisation de l'énergie pour un joueur
     public static void setEnergy(Player player, int amount) {
@@ -47,21 +45,6 @@ public class EnergyManager implements CommandExecutor {
     // Diminuer l'énergie
     public static void reduceEnergy(Player player, int amount) {
         setEnergy(player, Math.max(0, getEnergy(player) - amount));
-    }
-
-    // Bloquer les capacités d'un joueur pour une durée en secondes
-    public static void blockAbilities(Player player, int duration) {
-        blockedPlayers.put(player.getUniqueId(), System.currentTimeMillis() + (duration * 1000));
-    }
-
-    // Vérifier si un joueur est bloqué
-    public static boolean isBlocked(Player player) {
-        return blockedPlayers.containsKey(player.getUniqueId()) && blockedPlayers.get(player.getUniqueId()) > System.currentTimeMillis();
-    }
-
-    // Réinitialiser l'énergie pour un joueur
-    public static void resetEnergy(Player player) {
-        setEnergy(player, DEFAULT_ENERGY);
     }
 
     // ✅ Commande /giveenergy <joueur> <quantité>
