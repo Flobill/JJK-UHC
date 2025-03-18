@@ -102,13 +102,15 @@ public class Nobara implements Listener {
             public void run() {
                 if (clousMarques.containsKey(nobaraID) && clousMarques.get(nobaraID).equals(cibleID)) {
                     double newHealth = Math.max(0, cible.getHealth() - CLOU_DAMAGE);
-                    cible.setHealth(newHealth); // ✅ Dégâts bruts, ignore l’armure
+                    cible.setHealth(newHealth);
 
                     cible.sendMessage(ChatColor.DARK_RED + "💥 Un clou maudit vous transperce, infligeant 2 cœurs de dégâts !");
 
                     CampType camp = GameManager.getPlayerCamp(cible);
                     if (camp.equals(CampType.FLEAUX)) {
                         nobara.sendMessage(ChatColor.DARK_PURPLE + "⚠ " + cible.getName() + " est un fléau !");
+                        // ✅ Avertir la cible SEULEMENT si c’est un Fléau
+                        cible.sendMessage(ChatColor.DARK_RED + "⚠ Nobara (" + nobara.getName() + ") a découvert votre camp !");
                     } else {
                         nobara.sendMessage(ChatColor.GREEN + "✔ " + cible.getName() + " n'est PAS un fléau.");
                     }
