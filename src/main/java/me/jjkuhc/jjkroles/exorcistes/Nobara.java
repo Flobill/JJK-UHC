@@ -110,7 +110,7 @@ public class Nobara implements Listener {
                     if (camp.equals(CampType.FLEAUX)) {
                         nobara.sendMessage(ChatColor.DARK_PURPLE + "⚠ " + cible.getName() + " est un fléau !");
                         // ✅ Avertir la cible SEULEMENT si c’est un Fléau
-                        cible.sendMessage(ChatColor.DARK_RED + "⚠ Nobara (" + nobara.getName() + ") a découvert votre camp !");
+                        cible.sendMessage(ChatColor.DARK_RED + "⚠ + nobara.getName() +  a découvert votre camp !");
                     } else {
                         nobara.sendMessage(ChatColor.GREEN + "✔ " + cible.getName() + " n'est PAS un fléau.");
                     }
