@@ -6,6 +6,7 @@ import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
 import me.jjkuhc.jjkconfig.*;
 import me.jjkuhc.jjkgame.*;
+import me.jjkuhc.jjkroles.exorcistes.Momo;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -86,8 +87,9 @@ public class Main extends JavaPlugin implements Listener {
             @Override
             public void run() {
                 GameManager.handleEpisodeStart();
+                Momo.detecterFleauxDebutEpisode();
             }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 14400L); // 12 minutes
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 1200L); // 12 minutes
 
     }
 
