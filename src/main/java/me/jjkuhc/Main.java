@@ -8,6 +8,7 @@ import me.jjkuhc.jjkconfig.*;
 import me.jjkuhc.jjkgame.*;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,7 +32,6 @@ public class Main extends JavaPlugin implements Listener {
         int pvpTimer = getConfig().getInt("timers.pvp", 10);
         int invincibilityTimer = getConfig().getInt("timers.invincibility", 10);
         int roleAnnouncementTimer = getConfig().getInt("timers.role_announcement", 5);
-
 
         scoreboardManager = new ScoreboardManager(this);
 
@@ -62,6 +62,25 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new RoleConfigMenu(), this);
         getServer().getPluginManager().registerEvents(new CampRoleMenu(), this);
         getServer().getPluginManager().registerEvents(new SukunaFingerListener(), this);
+
+        // ✅ Remet à 0 tous les effets et l'invisibilité
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            // Supprime tous les effets
+            player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
+
+            // Remet la vie max
+            player.setMaxHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+            player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+
+            // Remet visible si jamais il était invisible (genre Geto)
+            player.setInvisible(false);
+
+            // Remet le nom dans la tablist au cas où
+            player.setPlayerListName(player.getName());
+
+            // ✅ Vide l'inventaire
+            player.getInventory().clear();
+        }
 
         new BukkitRunnable() {
             @Override

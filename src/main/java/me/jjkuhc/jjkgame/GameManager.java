@@ -10,6 +10,8 @@ import me.jjkuhc.jjkroles.exorcistes.Gojo;
 import me.jjkuhc.jjkroles.exorcistes.Itadori;
 import me.jjkuhc.jjkroles.exorcistes.Megumi;
 import me.jjkuhc.jjkroles.exorcistes.Nobara;
+import me.jjkuhc.jjkroles.exorcistes.Momo;
+import me.jjkuhc.jjkroles.fleaux.Geto;
 import me.jjkuhc.jjkroles.fleaux.Hanami;
 import me.jjkuhc.jjkroles.fleaux.Jogo;
 import me.jjkuhc.jjkroles.neutres.Sukuna;
@@ -127,6 +129,14 @@ public class GameManager {
                         if (role == RoleType.HANAMI) {
                             Hanami hanami = new Hanami(player);
                             Bukkit.getServer().getPluginManager().registerEvents(hanami, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
+                        if (role == RoleType.GETO) {
+                            Geto geto = new Geto(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(geto, Bukkit.getPluginManager().getPlugin("JJKUHC"));
+                        }
+                        if (role == RoleType.MOMO) {
+                            Momo momo = new Momo(player);
+                            Bukkit.getServer().getPluginManager().registerEvents(momo, Bukkit.getPluginManager().getPlugin("JJKUHC"));
                         }
                     }
                 }

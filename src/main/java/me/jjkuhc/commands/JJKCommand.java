@@ -98,8 +98,6 @@ public class JJKCommand implements CommandExecutor {
                     player.sendMessage("§c❌ Ce joueur n'est pas en ligne !");
                     return true;
                 }
-
-                // Appel de la fonction pour poser le clou
                 Nobara.poserClou(player, target);
                 return true;
 
@@ -120,10 +118,18 @@ public class JJKCommand implements CommandExecutor {
                     player.sendMessage("§c❌ Ce joueur n'est pas en ligne !");
                     return true;
                 }
-
                 // Appel de la fonction utiliserBourgeon dans Hanami
                 Hanami hanami = new Hanami(player);
                 hanami.utiliserBourgeon(cibleBourgeon);
+                return true;
+
+            case "mort":
+                if (GameManager.getPlayerRole(player) != RoleType.GETO) {
+                    player.sendMessage("§c❌ Seul Suguru Geto peut utiliser cette commande !");
+                    return true;
+                }
+
+                me.jjkuhc.jjkroles.fleaux.Geto.getGetoInstance(player).simulerMort();
                 return true;
 
             default:
