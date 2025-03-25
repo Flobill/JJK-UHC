@@ -254,8 +254,6 @@ public class GameManager {
     }
 
     public static void handleEpisodeStart() {
-        Bukkit.broadcastMessage("§e🌟 Début d'un nouvel épisode !");
-
         for (Player player : Bukkit.getOnlinePlayers()) {
             RoleType role = GameManager.getPlayerRole(player);
 

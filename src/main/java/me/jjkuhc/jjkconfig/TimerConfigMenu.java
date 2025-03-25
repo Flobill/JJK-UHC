@@ -15,6 +15,9 @@ public class TimerConfigMenu implements Listener {
     private static int invincibilityTimer = 90; // Par défaut 2 minutes
     private String selectedTimer = "PVP"; // PVP sélectionné par défaut
     private static int roleAnnouncementTimer = 120; // Par défaut 2 minutes
+    static int dayDuration = 60;   // Par défaut 6 min
+    static int nightDuration = 60; // Par défaut 6 min
+
 
     public void open(Player player) {
         Inventory inv = Bukkit.createInventory(null, 27, "§eConfiguration des Timers");
@@ -43,15 +46,24 @@ public class TimerConfigMenu implements Listener {
             timerDisplay = formatTime(pvpTimer);
         } else if (selectedTimer.equals("Invincibilité")) {
             timerDisplay = formatTime(invincibilityTimer);
+        } else if (selectedTimer.equals("Annonce des rôles")) {
+            timerDisplay = formatTime(roleAnnouncementTimer);
+        } else if (selectedTimer.equals("Jour")) {
+            timerDisplay = formatTime(dayDuration);
+        } else if (selectedTimer.equals("Nuit")) {
+            timerDisplay = formatTime(nightDuration);
         } else {
-            timerDisplay = formatTime(roleAnnouncementTimer); // Ajout de l'affichage correct
+            timerDisplay = "0s";
         }
         setItem(inv, 13, Material.CLOCK, "§e" + timerDisplay);
+
 
         // Sélecteurs de timer (PVP, Invincibilité, rôles)
         setItem(inv, 3, Material.IRON_SWORD, "§bTimer PVP");
         setItem(inv, 5, Material.SHIELD, "§bTimer Invincibilité");
         setItem(inv, 7, Material.NAME_TAG, "§bAnnonce des rôles");
+        setItem(inv, 20, Material.SUNFLOWER, "§eTemps de Jour");
+        setItem(inv, 21, Material.BLACK_BED, "§8Temps de Nuit");
 
         // Flèche de retour
         setItem(inv, 26, Material.ARROW, "§7Retour");
@@ -118,6 +130,12 @@ public class TimerConfigMenu implements Listener {
             case "§7Retour":
                 new ConfigMenu().open(player);
                 return;
+            case "§eTemps de Jour":
+                selectedTimer = "Jour";
+                break;
+            case "§8Temps de Nuit":
+                selectedTimer = "Nuit";
+                break;
         }
         open(player); // Rafraîchir le menu
     }
@@ -129,6 +147,11 @@ public class TimerConfigMenu implements Listener {
             invincibilityTimer = Math.max(10, invincibilityTimer + amount);
         } else if (selectedTimer.equals("Annonce des rôles")) {
             roleAnnouncementTimer = Math.max(5, roleAnnouncementTimer + amount); // Ajout du timer correct
+        }
+        else if (selectedTimer.equals("Jour")) {
+            dayDuration = Math.max(60, dayDuration + amount); // Minimum 1 min
+        } else if (selectedTimer.equals("Nuit")) {
+            nightDuration = Math.max(60, nightDuration + amount); // Minimum 1 min
         }
     }
 
@@ -144,7 +167,11 @@ public class TimerConfigMenu implements Listener {
         return roleAnnouncementTimer;
     }
 
-    public static void setRoleAnnouncementTimer(int time) {
-        roleAnnouncementTimer = time;
+    public static int getDayDuration() {
+        return dayDuration;
+    }
+
+    public static int getNightDuration() {
+        return nightDuration;
     }
 }

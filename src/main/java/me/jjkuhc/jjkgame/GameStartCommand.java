@@ -1,6 +1,7 @@
 package me.jjkuhc.jjkgame;
 
 import me.jjkuhc.host.HostManager;
+import me.jjkuhc.jjkconfig.EpisodeManager;
 import me.jjkuhc.jjkconfig.StuffManager;
 import me.jjkuhc.jjkconfig.TimerConfigMenu;
 import org.bukkit.*;
@@ -62,7 +63,6 @@ public class GameStartCommand implements CommandExecutor {
             @Override
             public void run() {
                 Bukkit.broadcastMessage("§c⌛ L'invincibilité est terminée !");
-                GameManager.setCurrentState(GameState.EN_COURS);
 
                 // 🔒 Réappliquer la protection de l'inventaire en fermant tous les menus
                 Bukkit.getScheduler().runTask(plugin, () -> {
@@ -98,7 +98,7 @@ public class GameStartCommand implements CommandExecutor {
         }
 
         // Vérifie s'il y a au moins 2 joueurs
-        if (Bukkit.getOnlinePlayers().size() < 2) {
+        if (Bukkit.getOnlinePlayers().size() < 1) {
             sender.sendMessage("§cIl faut au moins 2 joueurs pour commencer la partie !");
             return true;
         }
@@ -139,6 +139,7 @@ public class GameStartCommand implements CommandExecutor {
                     Bukkit.broadcastMessage("§a⌚ Début de la partie !");
                     GameManager.setCurrentState(GameState.EN_COURS);
                     scoreboardManager.updateAllScoreboards();
+                    EpisodeManager.startEpisodeCycle(); //On lance les épisodes DIRECTEMENT au début
 
                     startTimers(); //DÉMARRER LES TIMERS
 

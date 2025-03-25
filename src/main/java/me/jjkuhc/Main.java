@@ -82,15 +82,6 @@ public class Main extends JavaPlugin implements Listener {
             // ✅ Vide l'inventaire
             player.getInventory().clear();
         }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                GameManager.handleEpisodeStart();
-                Momo.detecterFleauxDebutEpisode();
-            }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 1200L); // 12 minutes
-
     }
 
     @Override
