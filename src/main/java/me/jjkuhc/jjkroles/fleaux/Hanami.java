@@ -27,11 +27,18 @@ public class Hanami implements Listener {
     private final HashMap<UUID, ItemStack> removedItems = new HashMap<>();
     private final HashMap<UUID, Collection<PotionEffect>> storedEffects = new HashMap<>();
     private static final HashMap<UUID, Double> coeursPerdus = new HashMap<>();
+    private final Map<UUID, Integer> episodeFinMalédiction = new HashMap<>();
+    private static final Map<UUID, Hanami> hanamiInstances = new HashMap<>();
+    private long dernierBourgeon = 0L;
+    private static final long COOLDOWN_BOURGEON = 6 * 60 * 1000; // 6 minutes
 
     public Hanami(Player player) {
         this.player = player;
+        hanamiInstances.put(player.getUniqueId(), this);
+
         if (player != null && player.isOnline()) {
             EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
             donnerNetherStar();
         }
@@ -74,11 +81,32 @@ public class Hanami implements Listener {
             return;
         }
 
+        long maintenant = System.currentTimeMillis();
+        if (maintenant - dernierBourgeon < COOLDOWN_BOURGEON) {
+            long restant = (COOLDOWN_BOURGEON - (maintenant - dernierBourgeon)) / 1000;
+            player.sendMessage(ChatColor.RED + "❌ Bourgeon est en recharge pendant encore " + restant + " secondes.");
+            return;
+        }
+
+        if (joueursMaudits.contains(cible.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "❌ Ce joueur est déjà maudit !");
+            return;
+        }
+
+        // ✅ MAJ du nombre d'utilisations AVANT de return
+        dernierBourgeon = maintenant;
+        bourgeonUtilisations++;
+
         joueursMaudits.add(cible.getUniqueId());
+        cible.sendMessage(ChatColor.DARK_RED + "💀 Vous avez été maudit par Hanami !");
+        int episodeActuel = me.jjkuhc.jjkconfig.EpisodeManager.getEpisodeCount();
+        episodeFinMalédiction.put(cible.getUniqueId(), episodeActuel + 1);
         player.sendMessage(ChatColor.DARK_GREEN + "🌿 " + cible.getName() + " a été maudit !");
 
         int energieInitiale = EnergyManager.getEnergy(cible);
         coeursPerdus.putIfAbsent(cible.getUniqueId(), 0.0);
+        updateMaxHealthWithBourgeon(cible);
+
 
         new BukkitRunnable() {
             private int lastEnergy = energieInitiale;
@@ -103,24 +131,6 @@ public class Hanami implements Listener {
                 lastEnergy = currentEnergy;
             }
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 20L, 20L);
-
-        bourgeonUtilisations++;
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (joueursMaudits.contains(cible.getUniqueId())) {
-                    double recuperation = 2.0;
-                    double totalPerdu = coeursPerdus.getOrDefault(cible.getUniqueId(), 0.0);
-
-                    if (totalPerdu > 0) {
-                        coeursPerdus.put(cible.getUniqueId(), Math.max(0.0, totalPerdu - recuperation));
-                        updateMaxHealthWithBourgeon(cible);
-                        player.sendMessage(ChatColor.GREEN + "🌱 " + cible.getName() + " a récupéré 1 cœur.");
-                    }
-                }
-            }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 20L * 60 * 20, 20L * 60 * 20);
     }
 
     private void activerNauseeSombre() {
@@ -138,7 +148,7 @@ public class Hanami implements Listener {
                 cible.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0));
                 cible.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0));
 
-                if (EnergyManager.getMaxEnergy(cible) < MAX_ENERGIE_OCCULTE) {
+                if (EnergyManager.getMaxEnergy(cible) < EnergyManager.getMaxEnergy(player)) {
                     // Retire la Nether Star et la stocke
                     for (ItemStack item : cible.getInventory().getContents()) {
                         if (item != null && item.getType() == Material.NETHER_STAR) {
@@ -159,7 +169,7 @@ public class Hanami implements Listener {
                                 cible.sendMessage(ChatColor.GREEN + "✅ Votre pouvoir vous a été rendu !");
                             }
                         }
-                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 1 * 60 * 20); // 5 minutes en ticks
+                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 5 * 60 * 20); // 5 minutes en ticks
                 }
             }
         }
@@ -268,14 +278,60 @@ public class Hanami implements Listener {
     }
 
     public void updateMaxHealthWithBourgeon(Player cible) {
-        double baseHealth = cible.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
         double perte = coeursPerdus.getOrDefault(cible.getUniqueId(), 0.0);
-
-        double newHealth = Math.max(4.0, baseHealth - perte);
-        cible.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(newHealth);
+        double newHealth = Math.max(4.0, 20.0 - perte);
+        if (cible.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+            cible.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(newHealth);
+        }
     }
 
     public static double getCoeursPerdus(Player player) {
         return coeursPerdus.getOrDefault(player.getUniqueId(), 0.0);
     }
+
+    public void verifierFinMalédictions() {
+        int episodeActuel = me.jjkuhc.jjkconfig.EpisodeManager.getEpisodeCount();
+
+        Iterator<UUID> iterator = joueursMaudits.iterator();
+        while (iterator.hasNext()) {
+            UUID id = iterator.next();
+            int fin = episodeFinMalédiction.getOrDefault(id, -1);
+
+            if (episodeActuel >= fin) {
+                Player cible = Bukkit.getPlayer(id);
+                if (cible != null && cible.isOnline()) {
+                    cible.sendMessage(ChatColor.GREEN + "🌱 La malédiction de Hanami a disparu.");
+                }
+
+                iterator.remove();
+                episodeFinMalédiction.remove(id);
+            }
+        }
+    }
+
+    public static void verifierToutesLesMalédictions() {
+        for (Hanami h : hanamiInstances.values()) {
+            h.rendreUnCoeurAuxJoueursMaudits();
+            h.verifierFinMalédictions();
+        }
+    }
+
+    public static Hanami getHanamiInstance(Player player) {
+        return hanamiInstances.get(player.getUniqueId());
+    }
+
+    public void rendreUnCoeurAuxJoueursMaudits() {
+        for (UUID id : joueursMaudits) {
+            Player cible = Bukkit.getPlayer(id);
+            if (cible != null && cible.isOnline()) {
+                double perdus = coeursPerdus.getOrDefault(id, 0.0);
+                if (perdus > 0) {
+                    coeursPerdus.put(id, Math.max(0.0, perdus - 2.0));
+                    updateMaxHealthWithBourgeon(cible); // met à jour la vie max du joueur
+                    cible.sendMessage(ChatColor.GREEN + "Vous récupérez 1 cœur permanent à la fin de l’épisode.");
+                }
+            }
+        }
+    }
+
 }

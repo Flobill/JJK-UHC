@@ -27,12 +27,14 @@ public class Itadori implements Listener {
     private boolean sprintActive = false;
     private BukkitRunnable sprintTask;
     private boolean hasBlackFlashActive = false;
+    private static final int MAX_ENERGIE_OCCULTE = 800;
 
     public Itadori(Player player) {
         this.player = player;
         if (player != null && player.isOnline()) {
             applyPermanentEffects();
-            EnergyManager.setEnergy(player, 800); // ✅ Energie occulte max 800
+            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             giveAbilityItem();
         }
     }

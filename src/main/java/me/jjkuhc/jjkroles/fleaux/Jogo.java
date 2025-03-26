@@ -37,6 +37,7 @@ public class Jogo implements Listener {
         this.player = player;
         if (player != null && player.isOnline()) {
             EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
             donnerNetherStar();
             verifierForceDeNuit();

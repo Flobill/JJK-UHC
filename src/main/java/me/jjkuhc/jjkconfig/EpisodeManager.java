@@ -3,6 +3,7 @@ package me.jjkuhc.jjkconfig;
 import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkgame.GameState;
 import me.jjkuhc.jjkroles.exorcistes.Momo;
+import me.jjkuhc.jjkroles.fleaux.Hanami;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -13,7 +14,6 @@ public class EpisodeManager {
     private static boolean isDay = true;
     private static int episodeCount = 0;
     public static boolean isDay() { return isDay; }
-    private static BukkitRunnable worldTimeTask;// 10 min référence vanilla
 
 
     public static void startEpisodeCycle() {
@@ -26,6 +26,9 @@ public class EpisodeManager {
         episodeCount++;
         Bukkit.broadcastMessage("§e☀ Jour " + episodeCount + " commence !");
         GameManager.handleEpisodeStart();
+        Momo.momoInstances.values().forEach(Momo::envoyerResultatDetection);
+        Hanami.verifierToutesLesMalédictions();
+
 
         // ✅ On force midi pile au début de la journée
         World uhcWorld = Bukkit.getWorld("UHC");
@@ -44,6 +47,7 @@ public class EpisodeManager {
     private static void runNightPhase() {
         isDay = false;
         Bukkit.broadcastMessage("§8🌙 La nuit tombe...");
+        Momo.momoInstances.values().forEach(Momo::startDetectionNuit);
 
         // ✅ On force minuit pile au début de la nuit
         World uhcWorld = Bukkit.getWorld("UHC");
@@ -57,6 +61,10 @@ public class EpisodeManager {
                 runDayPhase();
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), TimerConfigMenu.getNightDuration() * 20L);
+    }
+
+    public static int getEpisodeCount() {
+        return episodeCount;
     }
 
 }

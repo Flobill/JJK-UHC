@@ -17,26 +17,25 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.UUID;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Momo implements Listener {
 
     private static final int MAX_ENERGIE_OCCULTE = 600;
     private final Player player;
-    private boolean furtiviteActive = false;
     private static final int FURTIVITE_COST = 1; // 1 énergie par seconde
-    private boolean balaiUtilise = false;
     private static final int BALAI_COST = 500;
     private static final int DETECTION_RAYON = 20; // Portée de détection des fléaux
-    private static final Map<UUID, Momo> momoInstances = new HashMap<>();
+    public static final Map<UUID, Momo> momoInstances = new HashMap<>();
     private BukkitRunnable furtiviteTask;
+    private final Set<UUID> fleauxCroises = new HashSet<>();
+
 
     public Momo(Player player) {
         this.player = player;
         if (player != null && player.isOnline()) {
             EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
             momoInstances.put(player.getUniqueId(), this);
             giveBalaiItem();
@@ -140,27 +139,27 @@ public class Momo implements Listener {
         activerBalai(); // ✅ Lancer la capacité
     }
 
-    public static void detecterFleauxDebutEpisode() {
-        for (Player momoPlayer : Bukkit.getOnlinePlayers()) {
-            Momo momo = momoInstances.get(momoPlayer.getUniqueId());
-            if (momo == null) continue;
-
-            int count = 0;
-
-            for (Player cible : Bukkit.getOnlinePlayers()) {
-                if (cible.equals(momoPlayer)) continue;
-                if (me.jjkuhc.jjkgame.GameManager.getPlayerCamp(cible).toString().equals("FLEAUX")) {
-                    if (cible.getLocation().distance(momoPlayer.getLocation()) <= DETECTION_RAYON) {
-                        count++;
-                        // ✅ Prévenir le fléau qu'il a croisé Momo
-                        cible.sendMessage(ChatColor.DARK_PURPLE + "⚠ Momo Nishimiya vous a croisé cette nuit...");
+    public void startDetectionNuit() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!me.jjkuhc.jjkconfig.EpisodeManager.isDay()) { // On vérifie qu'on est bien la nuit
+                    for (Player cible : Bukkit.getOnlinePlayers()) {
+                        if (cible.equals(player)) continue;
+                        if (me.jjkuhc.jjkgame.GameManager.getPlayerCamp(cible).toString().equals("FLEAUX")) {
+                            if (cible.getLocation().distance(player.getLocation()) <= DETECTION_RAYON) {
+                                fleauxCroises.add(cible.getUniqueId());
+                            }
+                        }
                     }
                 }
             }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 20L); // Scan toutes les secondes
+    }
 
-            // ✅ Message à Momo
-            momoPlayer.sendMessage(ChatColor.LIGHT_PURPLE + "🌙 Pendant la nuit, tu as croisé " + count + " fléau(x).");
-        }
+    public void envoyerResultatDetection() {
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "🌙 Pendant la nuit, tu as croisé " + fleauxCroises.size() + " fléau(x).");
+        fleauxCroises.clear(); // Reset pour la prochaine nuit
     }
 
 }

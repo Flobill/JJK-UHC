@@ -23,7 +23,7 @@ import java.util.*;
 
 public class Gojo implements Listener {
     private final Player player;
-    private final Set<UUID> cooldowns = new HashSet<>();
+    private static final int MAX_ENERGIE_OCCULTE = 1500;
     private boolean hasUsedMurasaki = false;
     private boolean bandeauOnCooldown = false;
     private long cooldownStartTime = -1;
@@ -34,7 +34,8 @@ public class Gojo implements Listener {
         if (player != null && player.isOnline()) {
             applyPermanentEffects();
             revealMegumi();
-            EnergyManager.setEnergy(player, 1500);
+            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             giveAbilityItem();
         }
     }

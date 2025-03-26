@@ -35,7 +35,6 @@ public class Nobara implements Listener {
     private static final int EXPLOSION_CLOU_COST = 400;
     private BukkitTask actionBarTask;
     private boolean partageActif = false;
-    private UUID ciblePartageID = null;
     private static final int PARTAGE_COUT = 400;
 
     private static final HashMap<UUID, UUID> clousMarques = new HashMap<>();
@@ -47,6 +46,7 @@ public class Nobara implements Listener {
         this.player = player;
         if (player != null && player.isOnline()) {
             EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             donnerPochetteDeClous();
             donnerClousDepart();
         }

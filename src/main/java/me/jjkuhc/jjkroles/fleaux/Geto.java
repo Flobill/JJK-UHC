@@ -43,6 +43,7 @@ public class Geto implements Listener {
         this.player = player;
         if (player != null && player.isOnline()) {
             EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             applyPermanentEffects();
             giveAbilityItem();
             verifierForce();

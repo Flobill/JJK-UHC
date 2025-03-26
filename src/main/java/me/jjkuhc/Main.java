@@ -73,10 +73,9 @@ public class Main extends JavaPlugin implements Listener {
             player.setMaxHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
             player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
 
-            // Remet visible si jamais il était invisible (genre Geto)
+            // Remet visible Geto
             player.setInvisible(false);
 
-            // Remet le nom dans la tablist au cas où
             player.setPlayerListName(player.getName());
 
             // ✅ Vide l'inventaire

@@ -119,7 +119,7 @@ public class JJKCommand implements CommandExecutor {
                     return true;
                 }
                 // Appel de la fonction utiliserBourgeon dans Hanami
-                Hanami hanami = new Hanami(player);
+                Hanami hanami = Hanami.getHanamiInstance(player);
                 hanami.utiliserBourgeon(cibleBourgeon);
                 return true;
 
