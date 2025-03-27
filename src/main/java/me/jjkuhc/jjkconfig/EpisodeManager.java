@@ -24,7 +24,9 @@ public class EpisodeManager {
     private static void runDayPhase() {
         isDay = true;
         episodeCount++;
+        Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage("§e☀ Jour " + episodeCount + " commence !");
+        Bukkit.broadcastMessage("");
         GameManager.handleEpisodeStart();
         Momo.momoInstances.values().forEach(Momo::envoyerResultatDetection);
         Hanami.verifierToutesLesMalédictions();
@@ -46,7 +48,9 @@ public class EpisodeManager {
 
     private static void runNightPhase() {
         isDay = false;
-        Bukkit.broadcastMessage("§8🌙 La nuit tombe...");
+        Bukkit.broadcastMessage("");
+        Bukkit.broadcastMessage("§8La nuit tombe...");
+        Bukkit.broadcastMessage("");
         Momo.momoInstances.values().forEach(Momo::startDetectionNuit);
 
         // ✅ On force minuit pile au début de la nuit

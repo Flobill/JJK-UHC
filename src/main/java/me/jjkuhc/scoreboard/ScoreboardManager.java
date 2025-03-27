@@ -50,7 +50,7 @@ public class ScoreboardManager {
                     ? String.format("§f%dh %02dm %02ds", hours, minutes, seconds)
                     : String.format("§f%02dm %02ds", minutes, seconds);
 
-            objective.getScore("§6⏱ Temps : " + formattedTime).setScore(6);
+            objective.getScore("§6Temps : " + formattedTime).setScore(6);
         }
         objective.getScore("§b☺ Joueurs : §a" + Bukkit.getOnlinePlayers().size() + "§7/§c20").setScore(5);
         objective.getScore("§e⭐ Host : §f" + (HostManager.getHost() != null ? HostManager.getHost().getName() : "Aucun")).setScore(4);

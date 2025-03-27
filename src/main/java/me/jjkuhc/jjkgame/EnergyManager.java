@@ -6,6 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 
 import java.util.HashMap;
@@ -101,5 +103,20 @@ public class EnergyManager implements CommandExecutor {
         if (energyGain > 0) {
             addEnergy(attacker, energyGain);
         }
+    }
+
+    public static void startPassiveRegen(JavaPlugin plugin) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    int current = getEnergy(player);
+                    int max = getMaxEnergy(player);
+                    if (current < max) {
+                        setEnergy(player, Math.min(current + 1, max));
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L); // toutes les secondes
     }
 }

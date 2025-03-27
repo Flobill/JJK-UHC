@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import me.jjkuhc.jjkgame.GameManager;
 
 public class DeathManager implements Listener {
 
@@ -56,6 +55,21 @@ public class DeathManager implements Listener {
             deceased.setGameMode(org.bukkit.GameMode.SPECTATOR);
             deceased.sendMessage("§7☠ Vous êtes maintenant spectateur.");
         }, 200L); // 10 sec = 200 ticks
+    }
+
+    public static void broadcastDeathMessage(Player deceased) {
+        String role = GameManager.getPlayerRole(deceased).getDisplayName();
+        String message = "§c" + deceased.getName() + " §7est mort, son rôle était §c" + role;
+
+        Bukkit.broadcastMessage("§8§m==========================================");
+        Bukkit.broadcastMessage(" ");
+        Bukkit.broadcastMessage("§8[§c☠§8] §l" + message);
+        Bukkit.broadcastMessage(" ");
+        Bukkit.broadcastMessage("§8§m==========================================");
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
+        }
     }
 
 }

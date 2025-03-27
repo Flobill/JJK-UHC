@@ -163,13 +163,13 @@ public class Geto implements Listener {
 
     public void simulerMort() {
         if (mortSimulee) {
-            player.sendMessage(ChatColor.RED + "❌ Vous avez déjà simulé votre mort !");
+            player.sendMessage(ChatColor.RED + "Vous avez déjà simulé votre mort !");
             return;
         }
 
         mortSimulee = true;
-        Bukkit.broadcastMessage(ChatColor.DARK_RED + "☠ " + player.getName() + " est mort !");
-        player.sendMessage(ChatColor.GRAY + "💀 Vous avez simulé votre mort. Enlève ton armure pour devenir invisible.");
+        me.jjkuhc.jjkgame.DeathManager.broadcastDeathMessage(player);
+        player.sendMessage(ChatColor.GRAY + "Vous avez simulé votre mort. Enlève ton armure pour devenir invisible.");
 
         // Enlève le joueur du TAB
         player.setPlayerListName("");
@@ -217,7 +217,7 @@ public class Geto implements Listener {
             @Override
             public void run() {
                 revele = false;
-                player.sendMessage(ChatColor.GRAY + "💀 Vous pouvez de nouveau redevenir invisible en retirant votre armure.");
+                player.sendMessage(ChatColor.GRAY + "⚠ Vous pouvez de nouveau redevenir invisible en retirant votre armure.");
 
                 // ✅ Vérification auto pour redevenir invisible si pas d'armure
                 boolean porteArmure = false;
@@ -242,7 +242,7 @@ public class Geto implements Listener {
 
         if (System.currentTimeMillis() < lisereDisponibleApres) {
             long reste = (lisereDisponibleApres - System.currentTimeMillis()) / 1000;
-            player.sendMessage(ChatColor.RED + "⏳ Lisère du Supplice sera disponible dans " + reste / 60 + " min.");
+            player.sendMessage(ChatColor.RED + "Lisère du Supplice sera disponible dans " + reste / 60 + " min.");
             return;
         }
 

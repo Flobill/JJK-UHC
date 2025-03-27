@@ -35,6 +35,7 @@ public class Main extends JavaPlugin implements Listener {
         int roleAnnouncementTimer = getConfig().getInt("timers.role_announcement", 5);
 
         scoreboardManager = new ScoreboardManager(this);
+        EnergyManager.startPassiveRegen(this);
 
         //Les menus
         getServer().getPluginManager().registerEvents(new BorderConfigMenu(), this);

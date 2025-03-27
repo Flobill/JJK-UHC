@@ -86,12 +86,12 @@ public class GameManager {
     private static void startRoleAnnouncementTimer() {
         int roleAnnouncementTime = TimerConfigMenu.getRoleAnnouncementTimer();
 
-        Bukkit.broadcastMessage("§e⌛ Les rôles seront révélés dans §c" + roleAnnouncementTime + " secondes...");
+        Bukkit.broadcastMessage("§f[§9JJK UHC§f] §eLes rôles seront révélés dans §c" + roleAnnouncementTime + " secondes...");
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage("§a⚡ Les rôles ont été révélés !");
+                Bukkit.broadcastMessage("§f[§9JJK UHC§f] §aLes rôles ont été révélés !");
                 rolesRevealed = true;
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -165,7 +165,7 @@ public class GameManager {
             Player player = players.get(i);
             ItemStack sukunaFinger = new ItemStack(Material.NETHER_WART);
             player.getInventory().addItem(sukunaFinger);
-            player.sendMessage("§5⚡ Vous avez reçu un doigt de Sukuna !");
+            player.sendMessage("§f[§9JJK UHC§f] §5Vous avez reçu un doigt de Sukuna !");
         }
     }
 
@@ -245,7 +245,7 @@ public class GameManager {
             selected.add(sukuna); // Ajoute Sukuna une seule fois
         }
 
-        yuji.sendMessage("§6📜 Joueurs suspectés d'être Sukuna :");
+        yuji.sendMessage("§6Joueurs suspectés d'être Sukuna :");
         for (Player p : selected) {
             yuji.sendMessage(" - §b" + p.getName());
         }

@@ -51,7 +51,6 @@ public class Itadori implements Listener {
         meta.setDisplayName("§dPouvoirs de Yuji Itadori");
         abilityStar.setItemMeta(meta);
         player.getInventory().addItem(abilityStar);
-        player.sendMessage("§d✨ Vous avez reçu vos pouvoirs !");
     }
 
     // ✅ Redonner Force I si jamais il la perd
