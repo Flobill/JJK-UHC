@@ -139,7 +139,7 @@ public class JJKCommand implements CommandExecutor {
                 return true;
 
             default:
-                player.sendMessage("§cCommande inconnue. Utilisation : /jjk <config|sethost|recuperer>");
+                player.sendMessage("§cCommande inconnue. Utilisation : /jjk <config / sethost / recuperer / pacte / nobara / clou / bourgeon / mort>");
                 return true;
         }
     }

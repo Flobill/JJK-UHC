@@ -38,8 +38,20 @@ public class ScoreboardManager {
         RoleType playerRole = GameManager.getPlayerRole(player);
         CampType playerCamp = (playerRole != null) ? playerRole.getCamp() : null;
 
-        objective.getScore("§7┏━━━━━━━━━━━━━━━━━━┓").setScore(7);
-        objective.getScore("§6▪ État : §f" + GameManager.getCurrentState().getDisplayName()).setScore(6);
+        objective.getScore("§7┏━━━━━━━━━━━━━━━━━━┓").setScore(8);
+        objective.getScore("§6▪ État : §f" + GameManager.getCurrentState().getDisplayName()).setScore(7);
+        if (GameManager.isState(GameState.EN_COURS)) {
+            int totalSeconds = GameManager.getGameTimeInSeconds();
+            int hours = totalSeconds / 3600;
+            int minutes = (totalSeconds % 3600) / 60;
+            int seconds = totalSeconds % 60;
+
+            String formattedTime = (hours > 0)
+                    ? String.format("§f%dh %02dm %02ds", hours, minutes, seconds)
+                    : String.format("§f%02dm %02ds", minutes, seconds);
+
+            objective.getScore("§6⏱ Temps : " + formattedTime).setScore(6);
+        }
         objective.getScore("§b☺ Joueurs : §a" + Bukkit.getOnlinePlayers().size() + "§7/§c20").setScore(5);
         objective.getScore("§e⭐ Host : §f" + (HostManager.getHost() != null ? HostManager.getHost().getName() : "Aucun")).setScore(4);
 

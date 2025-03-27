@@ -31,6 +31,7 @@ public class GameManager {
     private static GameState currentState = GameState.EN_ATTENTE;
     private static final Map<UUID, RoleType> playerRoles = new HashMap<>();
     private static boolean rolesRevealed = false;
+    private static int gameTimeInSeconds = 0;
 
     public static GameState getCurrentState() {
         return currentState;
@@ -259,6 +260,18 @@ public class GameManager {
                 Itadori.checkAndApplyRegeneration(player);
             }
         }
+    }
+
+    public static int getGameTimeInSeconds() {
+        return gameTimeInSeconds;
+    }
+
+    public static void resetGameTime() {
+        gameTimeInSeconds = 0;
+    }
+
+    public static void incrementGameTime() {
+        gameTimeInSeconds++;
     }
 
 }

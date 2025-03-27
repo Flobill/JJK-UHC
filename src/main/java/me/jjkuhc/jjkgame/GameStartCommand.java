@@ -138,6 +138,17 @@ public class GameStartCommand implements CommandExecutor {
                     this.cancel();
                     Bukkit.broadcastMessage("§a⌚ Début de la partie !");
                     GameManager.setCurrentState(GameState.EN_COURS);
+                    GameManager.resetGameTime();
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (!GameManager.isState(GameState.EN_COURS)) {
+                                this.cancel();
+                                return;
+                            }
+                            GameManager.incrementGameTime();
+                        }
+                    }.runTaskTimer(plugin, 20L, 20L); // incrémente chaque seconde
                     scoreboardManager.updateAllScoreboards();
                     EpisodeManager.startEpisodeCycle(); //On lance les épisodes DIRECTEMENT au début
 
