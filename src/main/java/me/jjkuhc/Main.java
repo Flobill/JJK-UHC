@@ -54,6 +54,7 @@ public class Main extends JavaPlugin implements Listener {
         getCommand("gameinfo").setExecutor(new GameCommand());
         getCommand("jjkstart").setExecutor(new GameStartCommand(this, scoreboardManager));
         this.getCommand("giveenergy").setExecutor(new EnergyManager());
+        getServer().getPluginManager().registerEvents(new DeathManager(), this);
 
         //Les menus
         getServer().getPluginManager().registerEvents(this, this);
@@ -80,6 +81,9 @@ public class Main extends JavaPlugin implements Listener {
 
             // ✅ Vide l'inventaire
             player.getInventory().clear();
+
+            // ✅ Remet le joueur en mode survie
+            player.setGameMode(org.bukkit.GameMode.SURVIVAL);
         }
     }
 

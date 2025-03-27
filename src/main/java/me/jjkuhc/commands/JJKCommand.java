@@ -38,6 +38,12 @@ public class JJKCommand implements CommandExecutor {
             case "sethost":
                 return new HostCommand().onCommand(sender, command, label, args);
 
+            case "messagemort":
+                me.jjkuhc.jjkgame.DeathManager.toggleDeathMessage();
+                boolean state = me.jjkuhc.jjkgame.DeathManager.isDeathMessageEnabled();
+                player.sendMessage("§eSystème de mort : " + (state ? "§aActivé" : "§cDésactivé"));
+                return true;
+
             case "recuperer":
                 if (args.length < 2) {
                     player.sendMessage("§c❌ Utilisation correcte : /jjk recuperer <joueur>");

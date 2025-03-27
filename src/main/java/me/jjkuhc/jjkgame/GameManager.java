@@ -32,9 +32,6 @@ public class GameManager {
     private static final Map<UUID, RoleType> playerRoles = new HashMap<>();
     private static boolean rolesRevealed = false;
 
-    // ✅ Variable pour gérer le nombre de doigts à distribuer
-    private static int sukunaFingersToDistribute = 2; // Valeur par défaut
-
     public static GameState getCurrentState() {
         return currentState;
     }
