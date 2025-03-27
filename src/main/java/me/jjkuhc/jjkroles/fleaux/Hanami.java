@@ -182,7 +182,7 @@ public class Hanami implements Listener {
         }
 
         EnergyManager.reduceEnergy(player, SYLVE_LUGUBRE_COUT);
-        player.sendMessage(ChatColor.DARK_GREEN + "🌳 Vous avez activé Sylve Lugubre !");
+        player.sendMessage(ChatColor.DARK_GREEN + "Vous avez activé Sylve Lugubre !");
 
         World hanamiWorld = Bukkit.getWorld("Hanami");
         if (hanamiWorld == null) {
@@ -200,6 +200,7 @@ public class Hanami implements Listener {
                 // Stocker et retirer les effets
                 storedEffects.put(cible.getUniqueId(), new ArrayList<>(cible.getActivePotionEffects()));
                 cible.getActivePotionEffects().forEach(effect -> cible.removePotionEffect(effect.getType()));
+                player.sendMessage("🔍 " + cible.getName() + " est à " + String.format("%.2f", cible.getLocation().distance(player.getLocation())) + " blocs.");
 
                 if (!cible.equals(player)) {
                     cible.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1200, 0)); // 1 min
@@ -220,7 +221,7 @@ public class Hanami implements Listener {
                 Location randomLocation = new Location(hanamiWorld, randomX, spawnLocation.getY(), randomZ);
                 cible.teleport(randomLocation);
 
-                cible.sendMessage(ChatColor.DARK_RED + "🌲 Vous avez été capturé dans l'extension de Hanami !");
+                cible.sendMessage(ChatColor.DARK_RED + "Vous avez été capturé dans l'extension de Hanami !");
             }
         }
 
@@ -230,7 +231,7 @@ public class Hanami implements Listener {
         player.teleport(hanamiLocation);
 
         player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-        player.sendMessage(ChatColor.RED + "❌ Vous avez perdu votre Résistance !");
+        player.sendMessage(ChatColor.RED + "Vous avez perdu votre Résistance !");
 
         // Rétablir les joueurs après 1 minute
         new BukkitRunnable() {
@@ -268,11 +269,11 @@ public class Hanami implements Listener {
                     }
 
                     cible.removePotionEffect(PotionEffectType.SLOW);
-                    cible.sendMessage(ChatColor.GREEN + "✅ Vous avez quitté l'extension de Hanami !");
+                    cible.sendMessage(ChatColor.GREEN + "Vous avez quitté l'extension de Hanami !");
                 }
 
                 player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
-                player.sendMessage(ChatColor.GREEN + "✅ Vous avez retrouvé votre Résistance !");
+                player.sendMessage(ChatColor.GREEN + "Vous avez retrouvé votre Résistance !");
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 1200L); // 1 minute
     }

@@ -48,6 +48,10 @@ public class Sukuna implements Listener {
     private final Plugin plugin;
     private final Set<UUID> weakFléaux = new HashSet<>();
     private int fingerCount = 0;
+    private boolean innateLeftCooldown = false;
+    private boolean innateRightCooldown = false;
+    private boolean extensionCooldown = false;
+    private final Map<UUID, Collection<PotionEffect>> savedEffects = new HashMap<>();
 
     public Sukuna(Player player, Plugin plugin) {
         this.player = player;
@@ -262,12 +266,7 @@ public class Sukuna implements Listener {
         meta.setDisplayName("§cSorts Innés de Sukuna");
         innateSpells.setItemMeta(meta);
         player.getInventory().addItem(innateSpells);
-        player.sendMessage("§c✨ Vous avez reçu vos Sorts Innés !");
     }
-
-    // ✅ Cooldowns pour les capacités
-    private boolean innateLeftCooldown = false;
-    private boolean innateRightCooldown = false;
 
     // ✅ Gestion des clics sur la Nether Star
     @EventHandler
@@ -297,7 +296,7 @@ public class Sukuna implements Listener {
     // ✅ Clic gauche : Avancer de 4 blocs et infliger des effets
     private void useAdvanceAndDamage() {
         if (innateLeftCooldown) {
-            player.sendMessage("§c⏳ Sort indisponible, temps de recharge actif !");
+            player.sendMessage("§cSort indisponible, temps de recharge actif !");
             return;
         }
 
@@ -354,7 +353,7 @@ public class Sukuna implements Listener {
     // ✅ Clic droit : 3 cœurs d'absorption pendant 4 secondes
     private void useAbsorption() {
         if (innateRightCooldown) {
-            player.sendMessage("§c⏳ Sort indisponible, temps de recharge actif !");
+            player.sendMessage("§cSort indisponible, temps de recharge actif !");
             return;
         }
 
@@ -506,13 +505,10 @@ public class Sukuna implements Listener {
         sukuna.sendMessage("§5☠️ Vous possédez maintenant " + fingerCount + " doigt(s) !");
     }
 
-    // ✅ Cooldown et état de l'extension
-    private boolean extensionCooldown = false;
-
     // ✅ Activation de l'Extension de Territoire
     private void activateDomainExpansion() {
         if (extensionCooldown) {
-            player.sendMessage("§c⏳ L'extension est encore en cooldown !");
+            player.sendMessage("§cL'extension est encore en cooldown !");
             return;
         }
 
@@ -522,7 +518,6 @@ public class Sukuna implements Listener {
         }
 
         EnergyManager.reduceEnergy(player, 1200);
-        player.sendMessage("§4⛩️ Vous avez activé l'Extension de Territoire : Hôtel Démoniaque !");
 
         World sukunaWorld = Bukkit.getWorld("Sukuna");
         if (sukunaWorld == null) {
@@ -542,7 +537,7 @@ public class Sukuna implements Listener {
             @Override
             public void run() {
                 extensionCooldown = false;
-                player.sendMessage("§a🌀 Votre Extension de Territoire est à nouveau disponible !");
+                player.sendMessage("§aVotre Extension de Territoire est à nouveau disponible !");
             }
         }.runTaskLater(plugin, 12000L); // 10 minutes = 12000 ticks
 
@@ -576,7 +571,7 @@ public class Sukuna implements Listener {
         for (Player target : players) {
             double randomX = spawn.getX() + (Math.random() * 30) - 15;
             double randomZ = spawn.getZ() + (Math.random() * 30) - 15;
-            Location teleportLocation = new Location(domainWorld, randomX, 128, randomZ);
+            Location teleportLocation = new Location(domainWorld, randomX, 41, randomZ);
             target.teleport(teleportLocation);
 
             if (!target.equals(player)) {
@@ -627,9 +622,6 @@ public class Sukuna implements Listener {
             activateDomainExpansion();
         }
     }
-
-    // ✅ Stocker les effets des joueurs avant d'entrer dans l'extension
-    private final Map<UUID, Collection<PotionEffect>> savedEffects = new HashMap<>();
 
     // ✅ Stocker et enlever les effets avant la téléportation
     private void storeAndClearEffects(Player target) {

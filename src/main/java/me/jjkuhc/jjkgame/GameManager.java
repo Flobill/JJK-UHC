@@ -76,7 +76,7 @@ public class GameManager {
             public void run() {
                 distributeSukunaFingers(SukunaFingerMenu.getNumberOfSukunaFingers());
             }
-        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 300L); // 15 secondes (300 ticks)
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 6000L); // 5 minutes
 
 
         // ✅ Démarrer le timer d’annonce des rôles

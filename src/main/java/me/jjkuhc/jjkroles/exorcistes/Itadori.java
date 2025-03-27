@@ -147,7 +147,7 @@ public class Itadori implements Listener {
     @EventHandler
     public void onPlayerAttack(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player)) return;
-        if (!(event.getEntity() instanceof Player)) return; // ✅ Vérifie que la cible est un joueur
+        if (!(event.getEntity() instanceof Player)) return;
 
         Player attacker = (Player) event.getDamager();
         Player target = (Player) event.getEntity();
@@ -166,8 +166,8 @@ public class Itadori implements Listener {
             event.setDamage(newDamage);
 
             // ✅ Messages de debug
-            attacker.sendMessage("§6💥 Éclair Noir déclenché ! Dégâts bonus appliqués.");
-            target.sendMessage("§c⚡ Vous avez été touché par un Éclair Noir !");
+            attacker.sendMessage("§6Éclair Noir déclenché ! Dégâts bonus appliqués.");
+            target.sendMessage("§f[§9JJK UHC§f] §cVous avez été touché par un Éclair Noir !");
 
             // ✅ Désactive Éclair Noir après le coup
             hasBlackFlashActive = false;
@@ -199,7 +199,7 @@ public class Itadori implements Listener {
         if (sukunaFingers > 0 && player.getHealth() <= 16) { // Moins de 4 cœurs (8 points de vie)
             double newHealth = Math.min(player.getHealth() + 4, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
             player.setHealth(newHealth);
-            player.sendMessage("§a💖 Grâce au pouvoir de Sukuna, vous régénérez §c2 cœurs !");
+            player.sendMessage("§aGrâce au pouvoir de Sukuna, vous régénérez §c2 cœurs !");
         }
     }
 

@@ -67,7 +67,7 @@ public class Gojo implements Listener {
             selectedPlayers.add(megumiPlayer);
             Collections.shuffle(selectedPlayers);
 
-            player.sendMessage("§a🔍 Voici les joueurs suspectés d'être Megumi :");
+            player.sendMessage("§aVoici les joueurs suspectés d'être Megumi :");
             for (Player p : selectedPlayers) {
                 player.sendMessage(" - §b" + p.getName());
             }
@@ -89,8 +89,6 @@ public class Gojo implements Listener {
         bandeauMeta.setDisplayName("§9Bandeau de Gojo");
         bandeauStar.setItemMeta(bandeauMeta);
         player.getInventory().addItem(bandeauStar);
-
-        player.sendMessage("§a🌟 Vous avez reçu vos pouvoirs et votre bandeau !");
     }
 
     // ✅ Gestion unique des clics
@@ -142,7 +140,7 @@ public class Gojo implements Listener {
         }
 
         EnergyManager.reduceEnergy(player, 450);
-        player.sendMessage("§b💥 Vous avez utilisé Repulsion !");
+        player.sendMessage("§bVous avez utilisé Repulsion !");
 
         // ✅ Effets visuels et sonores
         player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation(), 100, new Particle.DustOptions(Color.RED, 1.0f));
@@ -156,7 +154,7 @@ public class Gojo implements Listener {
                 target.setHealth(newHealth);
                 Vector knockback = target.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().multiply(2);
                 target.setVelocity(knockback);
-                target.sendMessage("§c💥 Vous avez été repoussé par Gojo !");
+                target.sendMessage("§cVous avez été repoussé par Gojo !");
             }
         }
     }
@@ -178,7 +176,7 @@ public class Gojo implements Listener {
         target.teleport(player.getLocation().add(0, 1, 0));
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0));
 
-        player.sendMessage("§b🔵 " + target.getName() + " a été téléporté devant vous !");
+        player.sendMessage("§b" + target.getName() + " a été téléporté devant vous !");
     }
 
     // ✅ Capacité ultime : Murasaki
@@ -190,7 +188,7 @@ public class Gojo implements Listener {
 
         hasUsedMurasaki = true;
         EnergyManager.reduceEnergy(player, 900);
-        player.sendMessage("§d💥 Murasaki en chargement...");
+        player.sendMessage("§dMurasaki en chargement...");
 
         new BukkitRunnable() {
             @Override
@@ -230,12 +228,12 @@ public class Gojo implements Listener {
     // ✅ Activation du bandeau
     private void activateBandeau() {
         if (bandeauOnCooldown) {
-            player.sendMessage("§c⏳ Le bandeau est encore en cooldown !");
+            player.sendMessage("§cLe bandeau est encore en cooldown !");
             return;
         }
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3000, 1)); // Speed 2 pendant 2m30
-        player.sendMessage("§9🏃 Vous avez activé votre bandeau !");
+        player.sendMessage("§9Vous avez activé votre bandeau !");
 
         // ✅ Lancer le cooldown de 24000 ticks (un cycle jour/nuit)
         bandeauOnCooldown = true;
@@ -243,34 +241,9 @@ public class Gojo implements Listener {
             @Override
             public void run() {
                 bandeauOnCooldown = false;
-                player.sendMessage("§a🔄 Votre bandeau est à nouveau disponible !");
+                player.sendMessage("§aVotre bandeau est à nouveau disponible !");
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 24000L);
-    }
-
-    // ✅ Vérifier la fin du cooldown du bandeau
-    private void checkBandeauCooldown() {
-        if (bandeauOnCooldown) {
-            long currentTime = player.getWorld().getTime();
-            long timePassed = (currentTime >= cooldownStartTime)
-                    ? currentTime - cooldownStartTime
-                    : (24000 - cooldownStartTime) + currentTime; // Gère le passage de la nuit au jour
-
-            if (timePassed >= 24000) { // Un cycle complet = 24000 ticks
-                bandeauOnCooldown = false;
-                player.sendMessage("§a✅ Votre bandeau est à nouveau disponible !");
-            }
-        }
-    }
-
-    // ✅ Vérification régulière du cooldown (toutes les 5 secondes)
-    public void startCooldownChecker(JavaPlugin plugin) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                checkBandeauCooldown();
-            }
-        }.runTaskTimer(plugin, 0L, 100L); // Vérifie toutes les 5 secondes (100 ticks)
     }
 
     // ✅ Sphère de l'Espace Infini avec téléportation automatique après 1 minute
@@ -281,7 +254,7 @@ public class Gojo implements Listener {
         }
 
         EnergyManager.reduceEnergy(player, 1500);
-        player.sendMessage("§b♾️ Vous avez activé la Sphère de l'Espace Infini !");
+        player.sendMessage("§bVous avez activé la Sphère de l'Espace Infini !");
 
         World gojoWorld = Bukkit.getWorld("Gojo");
         if (gojoWorld == null) {
@@ -333,7 +306,7 @@ public class Gojo implements Listener {
 
             if (!target.equals(player)) {
                 storeAndClearEffects(target);
-                target.sendMessage("§cVous avez été aspiré dans la Sphère de Gojo !");
+                target.sendMessage("§f[§9JJK UHC§f] §cVous avez été aspiré dans la Sphère de Gojo !");
             } else {
                 player.sendMessage("§bVous êtes entré dans votre Sphère !");
             }
