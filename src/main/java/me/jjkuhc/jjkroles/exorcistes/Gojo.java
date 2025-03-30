@@ -26,13 +26,13 @@ public class Gojo implements Listener {
     private static final int MAX_ENERGIE_OCCULTE = 1500;
     private boolean hasUsedMurasaki = false;
     private boolean bandeauOnCooldown = false;
-    private long cooldownStartTime = -1;
     private final Map<UUID, Collection<PotionEffect>> savedEffects = new HashMap<>();
 
     public Gojo(Player player) {
         this.player = player;
         if (player != null && player.isOnline()) {
             applyPermanentEffects();
+            startEffectCheckTask();
             revealMegumi();
             EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
             EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
@@ -44,6 +44,35 @@ public class Gojo implements Listener {
     private void applyPermanentEffects() {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 0, false, false));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
+    }
+
+    private void startEffectCheckTask() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (player == null || !player.isOnline()) {
+                    cancel();
+                    return;
+                }
+
+                // ✅ N'applique les effets que si Gojo est dans le monde "uhc"
+                if (!player.getWorld().getName().equalsIgnoreCase("uhc")) {
+                    return;
+                }
+
+                // Vérification Speed
+                PotionEffect speed = player.getPotionEffect(PotionEffectType.SPEED);
+                if (speed == null || speed.getAmplifier() < 1) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
+                }
+
+                // Vérification Force
+                PotionEffect strength = player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE);
+                if (strength == null || strength.getAmplifier() < 1) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 0, false, false));
+                }
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 200L); // Toutes les 10s
     }
 
     // ✅ Révéler Megumi
@@ -311,27 +340,6 @@ public class Gojo implements Listener {
                 player.sendMessage("§bVous êtes entré dans votre Sphère !");
             }
         }
-
-        // ✅ Effets visuels de la Sphère avec une tâche qui s'arrête après la téléportation
-        BukkitRunnable particleTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player target : players) {
-                    target.getWorld().spawnParticle(Particle.SPELL_WITCH, target.getLocation(), 75);
-                }
-            }
-        };
-
-        // ✅ Démarrer les particules
-        particleTask.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 20L);
-
-        // ✅ Stopper les particules à la fin de la Sphère
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                particleTask.cancel();
-            }
-        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 1200L); // Arrêt des particules après 1 minute
     }
 
     // ✅ Retour dans le monde UHC après 1 minute
@@ -345,14 +353,24 @@ public class Gojo implements Listener {
         double borderSize = uhcWorld.getWorldBorder().getSize();
         Location spawn = uhcWorld.getWorldBorder().getCenter();
 
+        Set<UUID> treated = new HashSet<>(); // Évite les doublons
+
         for (Player target : players) {
+            if (treated.contains(target.getUniqueId())) continue;
+            treated.add(target.getUniqueId());
+
             double randomX = spawn.getX() + (Math.random() * borderSize / 2) - (borderSize / 4);
             double randomZ = spawn.getZ() + (Math.random() * borderSize / 2) - (borderSize / 4);
             int highestY = uhcWorld.getHighestBlockYAt((int) randomX, (int) randomZ) + 1;
             Location safeLocation = new Location(uhcWorld, randomX, highestY, randomZ);
 
             target.teleport(safeLocation);
-            restorePlayerEffects(target);
+
+            if (!target.equals(player)) {
+                restorePlayerEffects(target);
+            } else {
+                applyPermanentEffects(); // ✅ Méthode existante déjà parfaite
+            }
 
             target.sendMessage("§aVous avez quitté la Sphère !");
         }
