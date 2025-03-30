@@ -76,12 +76,21 @@ public class Sukuna implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (isNight(player.getWorld())) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 600, 0, false, false)); // Force I pendant la nuit
+                World world = player.getWorld();
+
+                // ✅ Force pendant la nuit normale
+                if (isNight(world)) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 201, 0, false, false));
+                }
+
+                // ✅ Force permanente dans le monde de l'extension de Sukuna
+                if (world.getName().equalsIgnoreCase("Sukuna")) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 201, 0, false, false));
                 }
             }
-        }.runTaskTimer(plugin, 0L, 600L); // Vérifie toutes les 30 secondes
+        }.runTaskTimer(plugin, 0L, 200L); // Toutes les 10 secondes
     }
+
 
     private boolean isNight(World world) {
         long time = world.getTime();
