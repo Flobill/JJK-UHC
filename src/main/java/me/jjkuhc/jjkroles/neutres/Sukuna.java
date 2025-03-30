@@ -437,7 +437,6 @@ public class Sukuna implements Listener {
 
                 // ✅ Vérifie si Sukuna est à moins de 15 blocs
                 if (sukuna.getLocation().distance(target.getLocation()) > 15) {
-                    sukuna.sendMessage("§e⚠️ Trop éloigné du joueur cible, rapprochez-vous !");
                     return; // Le vol est temporairement suspendu
                 }
 

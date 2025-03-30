@@ -17,7 +17,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class Main extends JavaPlugin implements Listener {
@@ -28,11 +27,6 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         getLogger().info("JJK UHC Plugin activé !");
         saveDefaultConfig(); // Pour créer le fichier config.yml s'il n'existe pas encore
-
-        // Charger les timers depuis la configuration
-        int pvpTimer = getConfig().getInt("timers.pvp", 10);
-        int invincibilityTimer = getConfig().getInt("timers.invincibility", 10);
-        int roleAnnouncementTimer = getConfig().getInt("timers.role_announcement", 5);
 
         scoreboardManager = new ScoreboardManager(this);
         EnergyManager.startPassiveRegen(this);

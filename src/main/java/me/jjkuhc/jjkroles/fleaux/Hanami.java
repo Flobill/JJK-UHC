@@ -196,42 +196,41 @@ public class Hanami implements Listener {
         for (Player cible : Bukkit.getOnlinePlayers()) {
             if (cible.getLocation().distance(player.getLocation()) <= 10) {
                 playersToTeleport.add(cible);
-
-                // Stocker et retirer les effets
-                storedEffects.put(cible.getUniqueId(), new ArrayList<>(cible.getActivePotionEffects()));
-                cible.getActivePotionEffects().forEach(effect -> cible.removePotionEffect(effect.getType()));
-                player.sendMessage("🔍 " + cible.getName() + " est à " + String.format("%.2f", cible.getLocation().distance(player.getLocation())) + " blocs.");
-
-                if (!cible.equals(player)) {
-                    cible.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1200, 0)); // 1 min
-                }
-
-                // Retirer la Nether Star
-                for (ItemStack item : cible.getInventory().getContents()) {
-                    if (item != null && item.getType() == Material.NETHER_STAR) {
-                        removedItems.put(cible.getUniqueId(), item);
-                        cible.getInventory().remove(item);
-                        break;
-                    }
-                }
-
-                // Téléportation aléatoire dans une zone de 30x30 blocs
-                double randomX = spawnLocation.getX() + (Math.random() * 30) - 15;
-                double randomZ = spawnLocation.getZ() + (Math.random() * 30) - 15;
-                Location randomLocation = new Location(hanamiWorld, randomX, spawnLocation.getY(), randomZ);
-                cible.teleport(randomLocation);
-
-                cible.sendMessage(ChatColor.DARK_RED + "Vous avez été capturé dans l'extension de Hanami !");
             }
         }
 
-        double randomX = spawnLocation.getX() + (Math.random() * 30) - 15;
-        double randomZ = spawnLocation.getZ() + (Math.random() * 30) - 15;
-        Location hanamiLocation = new Location(hanamiWorld, randomX, spawnLocation.getY(), randomZ);
-        player.teleport(hanamiLocation);
+        // ✅ Ajoute Hanami une seule fois s’il n’est pas déjà dedans
+        if (!playersToTeleport.contains(player)) {
+            playersToTeleport.add(player);
+        }
 
-        player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-        player.sendMessage(ChatColor.RED + "Vous avez perdu votre Résistance !");
+        for (Player cible : playersToTeleport) {
+            // Stocker et retirer les effets
+            storedEffects.put(cible.getUniqueId(), new ArrayList<>(cible.getActivePotionEffects()));
+            cible.getActivePotionEffects().forEach(effect -> cible.removePotionEffect(effect.getType()));
+
+            // Retrait et message si Hanami
+            if (cible.equals(player)) {
+                cible.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+                cible.sendMessage(ChatColor.RED + "Vous avez perdu votre Résistance !");
+            } else {
+                cible.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1200, 0));
+            }
+
+            // Retirer la Nether Star
+            for (ItemStack item : cible.getInventory().getContents()) {
+                if (item != null && item.getType() == Material.NETHER_STAR) {
+                    removedItems.put(cible.getUniqueId(), item);
+                    cible.getInventory().remove(item);
+                    break;
+                }
+            }
+
+            // Téléportation safe
+            Location safeLoc = findSafeLocation(hanamiWorld, spawnLocation, 20);
+            cible.teleport(safeLoc);
+            cible.sendMessage(ChatColor.DARK_RED + "Vous avez été capturé dans l'extension de Hanami !");
+        }
 
         // Rétablir les joueurs après 1 minute
         new BukkitRunnable() {
@@ -270,12 +269,35 @@ public class Hanami implements Listener {
 
                     cible.removePotionEffect(PotionEffectType.SLOW);
                     cible.sendMessage(ChatColor.GREEN + "Vous avez quitté l'extension de Hanami !");
-                }
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
-                player.sendMessage(ChatColor.GREEN + "Vous avez retrouvé votre Résistance !");
+                    // Redonner Résistance à Hanami uniquement
+                    if (cible.equals(player)) {
+                        cible.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
+                        cible.sendMessage(ChatColor.GREEN + "Vous avez retrouvé votre Résistance !");
+                    }
+                }
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 1200L); // 1 minute
+    }
+
+    private Location findSafeLocation(World world, Location base, int maxAttempts) {
+        for (int i = 0; i < maxAttempts; i++) {
+            double randomX = base.getX() + (Math.random() * 30) - 10;
+            double randomZ = base.getZ() + (Math.random() * 30) - 10;
+            int y = base.getBlockY();
+
+            // Teste 5 blocs vers le haut pour trouver de l'air
+            for (int dy = 0; dy <= 5; dy++) {
+                Location testLoc = new Location(world, randomX, y + dy, randomZ);
+                if (testLoc.getBlock().getType() == Material.AIR &&
+                        testLoc.clone().add(0, 1, 0).getBlock().getType() == Material.AIR) {
+                    return testLoc.add(0.5, 0, 0.5); // Centrage sur le bloc
+                }
+            }
+        }
+
+        // Si on ne trouve rien : fallback sur le spawn
+        return base;
     }
 
     public void updateMaxHealthWithBourgeon(Player cible) {

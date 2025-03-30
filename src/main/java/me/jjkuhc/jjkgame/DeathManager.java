@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import me.jjkuhc.jjkgame.VictoryManager;
 
 public class DeathManager implements Listener {
 
@@ -55,6 +56,11 @@ public class DeathManager implements Listener {
             deceased.setGameMode(org.bukkit.GameMode.SPECTATOR);
             deceased.sendMessage("§7☠ Vous êtes maintenant spectateur.");
         }, 200L); // 10 sec = 200 ticks
+
+        // 🧠 Vérifie la victoire après 11 secondes
+        Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), () -> {
+            VictoryManager.checkVictory();
+        }, 220L);
     }
 
     public static void broadcastDeathMessage(Player deceased) {

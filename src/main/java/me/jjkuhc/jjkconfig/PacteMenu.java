@@ -4,6 +4,7 @@ import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkroles.RoleType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -105,10 +106,15 @@ public class PacteMenu implements Listener {
     // 📌 Pacte Coopératif
     private void selectCooperationPact(Player player) {
         playerPacts.put(player.getUniqueId(), "Cooperation");
-        player.sendMessage("§a⚖ Vous avez choisi le Pacte Coopératif !");
+        player.sendMessage("§aVous avez choisi le Pacte Coopératif !");
+        Player sukuna = GameManager.getSukunaPlayer();
+        if (sukuna != null && sukuna.isOnline()) {
+            sukuna.sendMessage("§f[§9JJK UHC§f] §l§6Itadori a choisi le Pacte Coopératif, vous devez désormais gagner ensemble§6 !");
+            sukuna.playSound(sukuna.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 1.0f);
+        }
 
         // ✅ Ajoute Résistance I la nuit
-        player.sendMessage("§7🌙 Vous obtenez §6Résistance I la nuit !");
+        player.sendMessage("§7Vous obtenez §6Résistance I la nuit !");
         GameManager.applyNightResistance(player);
 
         // ✅ Envoie automatiquement les doigts à Sukuna

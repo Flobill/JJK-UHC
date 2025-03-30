@@ -57,6 +57,8 @@ public class JJKCommand implements CommandExecutor {
                     RoleType role = GameManager.getPlayerRole(player);
                     if (role == RoleType.ITADORI) {
                         PacteMenu.openPacteMenu(player);
+                        player.sendMessage("§f[§9JJK UHC§f] §aOuverture du menu de pacte...");
+                        PacteMenu.openPacteMenu(player);
                         return true;
                     } else {
                         player.sendMessage("§cSeul Itadori Yuji peut faire un pacte !");
