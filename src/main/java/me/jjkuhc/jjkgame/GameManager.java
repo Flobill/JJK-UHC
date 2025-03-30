@@ -184,7 +184,6 @@ public class GameManager {
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 600L); // Vérifie toutes les 30s
     }
 
-    // ✅ Détecter si c'est la nuit
     private static boolean isNight(World world) {
         long time = world.getTime();
         return time >= 13000 && time <= 23000;
@@ -196,7 +195,7 @@ public class GameManager {
                 return onlinePlayer;
             }
         }
-        return null; // Retourne null si Sukuna est mort ou n'existe pas
+        return null;
     }
 
     public static void setFingersToSukuna(Player player) {

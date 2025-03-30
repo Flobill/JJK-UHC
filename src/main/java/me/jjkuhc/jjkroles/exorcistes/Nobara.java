@@ -124,7 +124,7 @@ public class Nobara implements Listener {
             @Override
             public void run() {
                 clousMarques.remove(nobaraID);
-                nobara.sendMessage(ChatColor.GRAY + "🔹 Le clou posé sur " + cible.getName() + " a disparu.");
+                nobara.sendMessage(ChatColor.GRAY + "Le clou posé sur " + cible.getName() + " a disparu.");
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 900 * 20L); // 15 minutes
     }

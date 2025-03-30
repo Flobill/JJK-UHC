@@ -46,12 +46,12 @@ import java.util.*;
 public class Sukuna implements Listener {
     private final Player player;
     private final Plugin plugin;
-    private final Set<UUID> weakFléaux = new HashSet<>();
     private int fingerCount = 0;
     private boolean innateLeftCooldown = false;
     private boolean innateRightCooldown = false;
     private boolean extensionCooldown = false;
     private final Map<UUID, Collection<PotionEffect>> savedEffects = new HashMap<>();
+    private static final Map<UUID, Boolean> stealActiveMap = new HashMap<>();
 
     public Sukuna(Player player, Plugin plugin) {
         this.player = player;
@@ -90,7 +90,6 @@ public class Sukuna implements Listener {
             }
         }.runTaskTimer(plugin, 0L, 200L); // Toutes les 10 secondes
     }
-
 
     private boolean isNight(World world) {
         long time = world.getTime();
@@ -436,53 +435,43 @@ public class Sukuna implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // ✅ Si la cible meurt, annuler le vol
                 if (target.isDead() || !target.isOnline()) {
                     sukuna.sendMessage("§cLe vol a échoué : le joueur est mort ou déconnecté !");
                     stealProgressBar.removeAll();
+                    stealActiveMap.remove(sukuna.getUniqueId());
                     this.cancel();
                     return;
                 }
 
-                // ✅ Vérifie si Sukuna est à moins de 15 blocs
-                if (sukuna.getLocation().distance(target.getLocation()) > 15) {
-                    return; // Le vol est temporairement suspendu
+                boolean isClose = sukuna.getLocation().distance(target.getLocation()) <= 15;
+                boolean wasActive = stealActiveMap.getOrDefault(sukuna.getUniqueId(), true);
+
+                if (!isClose) {
+                    if (wasActive) {
+                        sukuna.sendMessage("§cVous êtes trop loin de " + target.getName() + " ! Le vol est interrompu.");
+                        stealActiveMap.put(sukuna.getUniqueId(), false);
+                    }
+                    return;
+                } else {
+                    if (!wasActive) {
+                        sukuna.sendMessage("§aVous êtes à nouveau proche de " + target.getName() + " ! Le vol reprend.");
+                        stealActiveMap.put(sukuna.getUniqueId(), true);
+                    }
                 }
 
-                // ✅ Mise à jour de la barre de progression
-                ticksPassed[0] += 20; // +1 seconde (20 ticks)
+                ticksPassed[0] += 20;
                 double progress = (double) ticksPassed[0] / totalTicks;
                 stealProgressBar.setProgress(progress);
 
-                // ✅ Si le vol est terminé
                 if (ticksPassed[0] >= totalTicks) {
-                    // ✅ Transférer les doigts
-                    for (ItemStack item : target.getInventory().getContents()) {
-                        if (item != null && item.getType() == Material.NETHER_WART) {
-                            target.getInventory().remove(item);
-                            sukuna.getInventory().addItem(item);
-                            sukuna.sendMessage("§5Vous avez récupéré un doigt de Sukuna !");
-                        }
-                    }
-
-                    // ✅ Mise à jour des effets des doigts pour Sukuna
-                    updateSukunaFingerEffects(sukuna);
-
-                    // ✅ Envoyer un message 5 minutes après le vol
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (target.isOnline()) {
-                                target.sendMessage("§4⚠ Vous avez découvert que Sukuna vous a volé un ou plusieurs doigts !");
-                            }
-                        }
-                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 6000L); // 5 minutes (6000 ticks)
+                    // transfert des doigts...
 
                     stealProgressBar.removeAll();
+                    stealActiveMap.remove(sukuna.getUniqueId());
                     this.cancel();
                 }
             }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 20L); // Exécuté toutes les secondes
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("JJKUHC"), 0L, 20L);
     }
 
     // ✅ Mise à jour des effets de Sukuna en fonction des doigts volés

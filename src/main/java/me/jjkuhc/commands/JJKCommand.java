@@ -52,6 +52,7 @@ public class JJKCommand implements CommandExecutor {
                 String targetName = args[1];
                 Sukuna.initiateFingerSteal(player, targetName); // Appel de la commande de Sukuna
                 return true;
+
             case "pacte":
                 if (GameManager.getCurrentState() == GameState.EN_COURS) {
                     RoleType role = GameManager.getPlayerRole(player);
