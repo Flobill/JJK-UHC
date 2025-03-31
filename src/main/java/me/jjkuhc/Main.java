@@ -6,7 +6,6 @@ import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
 import me.jjkuhc.jjkconfig.*;
 import me.jjkuhc.jjkgame.*;
-import me.jjkuhc.jjkroles.exorcistes.Momo;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;

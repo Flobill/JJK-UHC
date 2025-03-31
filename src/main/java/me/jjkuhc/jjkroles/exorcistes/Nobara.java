@@ -26,10 +26,10 @@ import java.util.UUID;
 
 public class Nobara implements Listener {
     private static final int CLOU_COST = 300;
-    private static final int CLOU_DURATION_WARNING = 30; // 5 minutes
-    private static final int CLOU_DURATION_DAMAGE = 60; // 10 minutes
+    private static final int CLOU_DURATION_WARNING = 300; // 5 minutes
+    private static final int CLOU_DURATION_DAMAGE = 600; // 10 minutes
     private static final int CLOU_DAMAGE = 4; // 2 cœurs = 4 HP
-    private static final int CLOU_COOLDOWN = 900; // 15 minutes
+    private static final int CLOU_COOLDOWN = 720; // 12 minutes
     private final Player player;
     private static final int MAX_ENERGIE_OCCULTE = 600;
     private static final int EXPLOSION_CLOU_COST = 400;
@@ -110,7 +110,7 @@ public class Nobara implements Listener {
                     if (camp.equals(CampType.FLEAUX)) {
                         nobara.sendMessage(ChatColor.DARK_PURPLE + "⚠ " + cible.getName() + " est un fléau !");
                         // ✅ Avertir la cible SEULEMENT si c’est un Fléau
-                        cible.sendMessage(ChatColor.DARK_RED + "⚠ + nobara.getName() +  a découvert votre camp !");
+                        cible.sendMessage(ChatColor.DARK_RED + "⚠ " + nobara.getName() + " a découvert votre camp !");
                     } else {
                         nobara.sendMessage(ChatColor.GREEN + "✔ " + cible.getName() + " n'est PAS un fléau.");
                     }
@@ -126,7 +126,7 @@ public class Nobara implements Listener {
                 clousMarques.remove(nobaraID);
                 nobara.sendMessage(ChatColor.GRAY + "Le clou posé sur " + cible.getName() + " a disparu.");
             }
-        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 900 * 20L); // 15 minutes
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 605 * 20L); // 10 minutes 05s
     }
 
     private void donnerPochetteDeClous() {
@@ -386,13 +386,5 @@ public class Nobara implements Listener {
             clous.setItemMeta(meta);
             player.getInventory().addItem(clous);
         }
-    }
-
-    private void ajouterClou(Player nobara) {
-        ItemStack clou = new ItemStack(Material.IRON_NUGGET, 1);
-        ItemMeta meta = clou.getItemMeta();
-        meta.setDisplayName(ChatColor.GOLD + "🧶 Clou Maudit");
-        clou.setItemMeta(meta);
-        nobara.getInventory().addItem(clou);
     }
 }
