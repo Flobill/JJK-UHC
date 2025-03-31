@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,15 +30,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -371,9 +364,9 @@ public class Sukuna implements Listener {
         }
 
         EnergyManager.reduceEnergy(player, 300);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 80, 2)); // 3 cœurs d'absorption
+        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 160, 1)); // 3 cœurs d'absorption
 
-        player.sendMessage("§b💖 Vous bénéficiez de 3 cœurs d'absorption temporairement !");
+        player.sendMessage("§bVous bénéficiez de 3 cœurs d'absorption temporairement !");
 
         // Début du cooldown de 5 minutes
         innateRightCooldown = true;
@@ -381,7 +374,7 @@ public class Sukuna implements Listener {
             @Override
             public void run() {
                 innateRightCooldown = false;
-                player.sendMessage("§a🌀 Votre sort droit est prêt à être réutilisé !");
+                player.sendMessage("§aVotre sort droit est prêt à être réutilisé !");
             }
         }.runTaskLater(plugin, 6000L); // 5 minutes
     }
@@ -428,7 +421,7 @@ public class Sukuna implements Listener {
         stealProgressBar.addPlayer(sukuna);
         stealProgressBar.setProgress(0.0);
 
-        final int totalTicks = 180 * 20; // 3 minutes = 180 secondes * 20 ticks
+        final int totalTicks = 180 * 20; // 3 minutes
         final int[] ticksPassed = {0};
 
         // ✅ Lancer le vol avec une vérification régulière
@@ -464,7 +457,29 @@ public class Sukuna implements Listener {
                 stealProgressBar.setProgress(progress);
 
                 if (ticksPassed[0] >= totalTicks) {
-                    // transfert des doigts...
+                    // ✅ Transfert d'1 seul doigt de Sukuna
+                    for (ItemStack item : target.getInventory().getContents()) {
+                        if (item != null && item.getType() == Material.NETHER_WART) {
+                            item.setAmount(item.getAmount() - 1); // Retire 1 doigt à la cible
+
+                            // Ajoute 1 doigt à Sukuna
+                            sukuna.getInventory().addItem(new ItemStack(Material.NETHER_WART, 1));
+
+                            sukuna.sendMessage("§5☠️ Vous avez volé 1 doigt à " + target.getName() + " !");
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    if (target.isOnline()) {
+                                        target.sendMessage("§cVous remarquez qu’un doigt de Sukuna a disparu...");
+                                    }
+                                }
+                            }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 20L * 60 * 5); // 5 minutes plus tard
+                            break;
+                        }
+                    }
+
+                    // ✅ Met à jour les effets des deux joueurs
+                    updateSukunaFingerEffects(sukuna);
 
                     stealProgressBar.removeAll();
                     stealActiveMap.remove(sukuna.getUniqueId());

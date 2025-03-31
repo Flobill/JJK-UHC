@@ -25,11 +25,11 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Nobara implements Listener {
-    private static final int CLOU_COST = 200;
-    private static final int CLOU_DURATION_WARNING = 30; // 2 minutes
+    private static final int CLOU_COST = 300;
+    private static final int CLOU_DURATION_WARNING = 30; // 5 minutes
     private static final int CLOU_DURATION_DAMAGE = 60; // 10 minutes
     private static final int CLOU_DAMAGE = 4; // 2 cœurs = 4 HP
-    private static final int CLOU_COOLDOWN = 600; // 10 minutes
+    private static final int CLOU_COOLDOWN = 900; // 15 minutes
     private final Player player;
     private static final int MAX_ENERGIE_OCCULTE = 600;
     private static final int EXPLOSION_CLOU_COST = 400;
@@ -104,7 +104,7 @@ public class Nobara implements Listener {
                     double newHealth = Math.max(0, cible.getHealth() - CLOU_DAMAGE);
                     cible.setHealth(newHealth);
 
-                    cible.sendMessage(ChatColor.DARK_RED + "💥 Un clou maudit vous transperce, infligeant 2 cœurs de dégâts !");
+                    cible.sendMessage(ChatColor.DARK_RED + "Un clou maudit vous transperce, infligeant 2 cœurs de dégâts !");
 
                     CampType camp = GameManager.getPlayerCamp(cible);
                     if (camp.equals(CampType.FLEAUX)) {
