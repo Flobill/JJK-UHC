@@ -53,7 +53,7 @@ public class Megumi implements Listener {
     public Megumi(Player player) {
         this.player = player;
         if (player != null && player.isOnline()) {
-            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setEnergy(player, 0);
             EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             startNightBuffChecker();
             giveAbilityItem();

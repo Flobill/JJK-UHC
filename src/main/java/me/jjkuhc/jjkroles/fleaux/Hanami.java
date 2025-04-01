@@ -37,7 +37,7 @@ public class Hanami implements Listener {
         hanamiInstances.put(player.getUniqueId(), this);
 
         if (player != null && player.isOnline()) {
-            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setEnergy(player, 0);
             EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
             donnerNetherStar();

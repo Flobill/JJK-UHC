@@ -33,7 +33,7 @@ public class Itadori implements Listener {
         this.player = player;
         if (player != null && player.isOnline()) {
             applyPermanentEffects();
-            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setEnergy(player, 0);
             EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             giveAbilityItem();
         }

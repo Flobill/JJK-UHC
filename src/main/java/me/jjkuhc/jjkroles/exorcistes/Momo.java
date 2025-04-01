@@ -34,7 +34,7 @@ public class Momo implements Listener {
     public Momo(Player player) {
         this.player = player;
         if (player != null && player.isOnline()) {
-            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setEnergy(player, 0);
             EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
             momoInstances.put(player.getUniqueId(), this);

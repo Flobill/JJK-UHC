@@ -45,7 +45,7 @@ public class Nobara implements Listener {
     public Nobara(Player player) {
         this.player = player;
         if (player != null && player.isOnline()) {
-            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setEnergy(player, 0);
             EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             donnerPochetteDeClous();
             donnerClousDepart();
@@ -119,14 +119,14 @@ public class Nobara implements Listener {
             }
         }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), CLOU_DURATION_DAMAGE * 20L);
 
-        // ✅ Suppression du clou après 15 minutes
+        // ✅ Suppression du clou après 10 minutes
         new BukkitRunnable() {
             @Override
             public void run() {
                 clousMarques.remove(nobaraID);
                 nobara.sendMessage(ChatColor.GRAY + "Le clou posé sur " + cible.getName() + " a disparu.");
             }
-        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 605 * 20L); // 10 minutes 05s
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 605 * 20L);
     }
 
     private void donnerPochetteDeClous() {

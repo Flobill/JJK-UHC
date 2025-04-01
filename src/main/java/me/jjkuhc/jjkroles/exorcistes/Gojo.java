@@ -34,7 +34,7 @@ public class Gojo implements Listener {
             applyPermanentEffects();
             startEffectCheckTask();
             revealMegumi();
-            EnergyManager.setEnergy(player, MAX_ENERGIE_OCCULTE);
+            EnergyManager.setEnergy(player, 0);
             EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             giveAbilityItem();
         }

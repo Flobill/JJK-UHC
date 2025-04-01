@@ -45,6 +45,7 @@ public class Sukuna implements Listener {
     private boolean extensionCooldown = false;
     private final Map<UUID, Collection<PotionEffect>> savedEffects = new HashMap<>();
     private static final Map<UUID, Boolean> stealActiveMap = new HashMap<>();
+    private static final int MAX_ENERGIE_OCCULTE = 1500;
 
     public Sukuna(Player player, Plugin plugin) {
         this.player = player;
@@ -52,7 +53,8 @@ public class Sukuna implements Listener {
 
         if (player != null && player.isOnline()) {
             applyPermanentEffects();
-            EnergyManager.setEnergy(player, 1500);
+            EnergyManager.setEnergy(player, 0);
+            EnergyManager.setMaxEnergy(player, MAX_ENERGIE_OCCULTE);
             giveCompass();
             startCompassUpdate();
             giveInnateSpellsItem();
@@ -538,7 +540,7 @@ public class Sukuna implements Listener {
         }
 
         Location spawnLocation = sukunaWorld.getSpawnLocation();
-        List<Player> nearbyPlayers = getNearbyPlayers(10);
+        List<Player> nearbyPlayers = getNearbyPlayers(15);
         teleportPlayersToDomain(nearbyPlayers, sukunaWorld, spawnLocation);
 
         player.sendMessage("§4Les joueurs ont été aspirés dans l'Hôtel Démoniaque !");
