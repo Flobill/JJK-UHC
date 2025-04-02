@@ -1,11 +1,15 @@
 package me.jjkuhc.jjkroles.fleaux;
 
 import me.jjkuhc.jjkgame.EnergyManager;
+import me.jjkuhc.jjkgame.GameManager;
+import me.jjkuhc.jjkroles.RoleType;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -182,7 +186,6 @@ public class Hanami implements Listener {
         }
 
         EnergyManager.reduceEnergy(player, SYLVE_LUGUBRE_COUT);
-        player.sendMessage(ChatColor.DARK_GREEN + "Vous avez activé Sylve Lugubre !");
 
         World hanamiWorld = Bukkit.getWorld("Hanami");
         if (hanamiWorld == null) {
@@ -209,12 +212,15 @@ public class Hanami implements Listener {
             storedEffects.put(cible.getUniqueId(), new ArrayList<>(cible.getActivePotionEffects()));
             cible.getActivePotionEffects().forEach(effect -> cible.removePotionEffect(effect.getType()));
 
-            // Retrait et message si Hanami
             if (cible.equals(player)) {
+                // Hanami : effets spéciaux
                 cible.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
                 cible.sendMessage(ChatColor.RED + "Vous avez perdu votre Résistance !");
+                cible.sendMessage(ChatColor.DARK_GREEN + "Vous avez activé Sylve Lugubre !");
             } else {
+                // Autres joueurs : ralentissement, message et retrait de Nether Star
                 cible.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1200, 0));
+                cible.sendMessage(ChatColor.DARK_RED + "Vous avez été capturé dans l'extension de Hanami !");
             }
 
             // Retirer la Nether Star
@@ -229,7 +235,6 @@ public class Hanami implements Listener {
             // Téléportation safe
             Location safeLoc = findSafeLocation(hanamiWorld, spawnLocation, 20);
             cible.teleport(safeLoc);
-            cible.sendMessage(ChatColor.DARK_RED + "Vous avez été capturé dans l'extension de Hanami !");
         }
 
         // Rétablir les joueurs après 1 minute
@@ -268,12 +273,12 @@ public class Hanami implements Listener {
                     }
 
                     cible.removePotionEffect(PotionEffectType.SLOW);
-                    cible.sendMessage(ChatColor.GREEN + "Vous avez quitté l'extension de Hanami !");
 
-                    // Redonner Résistance à Hanami uniquement
-                    if (cible.equals(player)) {
-                        cible.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
+                    if (!cible.equals(player)) {
+                        cible.sendMessage(ChatColor.GREEN + "Vous avez quitté l'extension de Hanami !");
+                    } else {
                         cible.sendMessage(ChatColor.GREEN + "Vous avez retrouvé votre Résistance !");
+                        cible.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
                     }
                 }
             }
@@ -354,6 +359,30 @@ public class Hanami implements Listener {
                     cible.sendMessage(ChatColor.GREEN + "Vous récupérez 1 cœur permanent à la fin de l’épisode.");
                 }
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player target = event.getPlayer();
+        World world = target.getWorld();
+
+        // ❌ Empêche de casser dans le monde "Hanami" sauf si c’est Hanami
+        if (world.getName().equals("hanami") && GameManager.getPlayerRole(target) != RoleType.HANAMI) {
+            event.setCancelled(true);
+            target.sendMessage(ChatColor.RED + "❌ Vous ne pouvez pas casser de blocs dans l'extension de Hanami !");
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player target = event.getPlayer();
+        World world = target.getWorld();
+
+        // ❌ Empêche de poser dans le monde "Hanami" sauf pour Hanami
+        if (world.getName().equals("hanami") && GameManager.getPlayerRole(target) != RoleType.HANAMI) {
+            event.setCancelled(true);
+            target.sendMessage(ChatColor.RED + "❌ Vous ne pouvez pas poser de blocs dans l'extension de Hanami !");
         }
     }
 
