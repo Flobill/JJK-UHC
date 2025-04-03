@@ -6,6 +6,12 @@ import me.jjkuhc.jjkcompass.CompassManager;
 import me.jjkuhc.jjkcompass.SetCompassCommand;
 import me.jjkuhc.jjkconfig.*;
 import me.jjkuhc.jjkgame.*;
+import me.jjkuhc.jjkroles.RoleType;
+import me.jjkuhc.jjkroles.exorcistes.*;
+import me.jjkuhc.jjkroles.fleaux.Geto;
+import me.jjkuhc.jjkroles.fleaux.Hanami;
+import me.jjkuhc.jjkroles.fleaux.Jogo;
+import me.jjkuhc.jjkroles.neutres.Sukuna;
 import me.jjkuhc.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -91,8 +97,33 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        scoreboardManager.setScoreboard(event.getPlayer());
+        Player player = event.getPlayer();
+
+        // Réaffiche son scoreboard
+        scoreboardManager.setScoreboard(player);
+
+        // Si la partie est en cours, on restaure son rôle
+        if (GameManager.isState(GameState.EN_COURS)) {
+            RoleType role = GameManager.getPlayerRole(player);
+
+            if (role != null) {
+                // Réinstancier le rôle
+                switch (role) {
+                    case GOJO -> Bukkit.getPluginManager().registerEvents(new Gojo(player), this);
+                    case HANAMI -> Bukkit.getPluginManager().registerEvents(new Hanami(player), this);
+                    case SUKUNA -> Bukkit.getPluginManager().registerEvents(new Sukuna(player, this), this);
+                    case ITADORI -> Bukkit.getPluginManager().registerEvents(new Itadori(player), this);
+                    case MEGUMI -> Bukkit.getPluginManager().registerEvents(new Megumi(player), this);
+                    case NOBARA -> Bukkit.getPluginManager().registerEvents(new Nobara(player), this);
+                    case MOMO -> Bukkit.getPluginManager().registerEvents(new Momo(player), this);
+                    case GETO -> Bukkit.getPluginManager().registerEvents(new Geto(player), this);
+                    case JOGO -> Bukkit.getPluginManager().registerEvents(new Jogo(player), this);
+                    default -> {}
+                }
+            }
+        }
     }
+
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {

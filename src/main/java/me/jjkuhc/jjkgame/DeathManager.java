@@ -1,6 +1,7 @@
 package me.jjkuhc.jjkgame;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -25,6 +26,9 @@ public class DeathManager implements Listener {
         if (!deathMessageEnabled) return;
 
         Player deceased = event.getEntity();
+
+        // 🚫 Supprimer les Nether Stars des drops
+        event.getDrops().removeIf(item -> item != null && item.getType() == Material.NETHER_STAR);
 
         // 🔇 Supprime le message par défaut
         event.setDeathMessage(null);

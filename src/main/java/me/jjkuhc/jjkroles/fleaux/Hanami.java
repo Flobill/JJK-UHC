@@ -173,7 +173,7 @@ public class Hanami implements Listener {
                                 cible.sendMessage(ChatColor.GREEN + "✅ Votre pouvoir vous a été rendu !");
                             }
                         }
-                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 5 * 60 * 20); // 5 minutes en ticks
+                    }.runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), 2 * 60 * 20); // 2 minutes en ticks
                 }
             }
         }
