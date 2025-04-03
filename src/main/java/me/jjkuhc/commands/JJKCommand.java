@@ -5,6 +5,8 @@ import me.jjkuhc.host.HostCommand;
 import me.jjkuhc.jjkconfig.PacteMenu;
 import me.jjkuhc.jjkgame.GameManager;
 import me.jjkuhc.jjkgame.GameState;
+import me.jjkuhc.jjkroles.CampManager;
+import me.jjkuhc.jjkroles.CampType;
 import me.jjkuhc.jjkroles.RoleType;
 import me.jjkuhc.jjkroles.exorcistes.Nobara;
 import me.jjkuhc.jjkroles.fleaux.Hanami;
@@ -13,6 +15,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.*;
 
 public class JJKCommand implements CommandExecutor {
 
@@ -42,6 +46,40 @@ public class JJKCommand implements CommandExecutor {
                 me.jjkuhc.jjkgame.DeathManager.toggleDeathMessage();
                 boolean state = me.jjkuhc.jjkgame.DeathManager.isDeathMessageEnabled();
                 player.sendMessage("§eSystème de mort : " + (state ? "§aActivé" : "§cDésactivé"));
+                return true;
+
+            case "compo":
+                Map<CampType, List<String>> rolesParCamp = new HashMap<>();
+
+                for (CampType camp : CampType.values()) {
+                    Set<RoleType> rolesActifs = CampManager.getInstance().getActiveRoles(camp);
+                    List<String> noms = new ArrayList<>();
+                    for (RoleType role : rolesActifs) {
+                        noms.add(role.getDisplayName());
+                    }
+                    rolesParCamp.put(camp, noms);
+                }
+
+                player.sendMessage("§7==========================================");
+                for (CampType camp : List.of(CampType.EXORCISTES, CampType.FLEAUX, CampType.NEUTRES)) {
+                    List<String> noms = rolesParCamp.getOrDefault(camp, new ArrayList<>());
+                    String ligne = switch (camp) {
+                        case EXORCISTES -> "§aExorcistes";
+                        case FLEAUX -> "§cFléaux";
+                        case NEUTRES -> "§6Neutres";
+                        default -> "§f" + camp.name();
+                    };
+
+                    String couleur = switch (camp) {
+                        case EXORCISTES -> "§a";
+                        case FLEAUX -> "§c";
+                        case NEUTRES -> "§6";
+                        default -> "§f";
+                    };
+
+                    player.sendMessage(couleur + camp.getDisplayName() + " (" + couleur + noms.size() + couleur + ") : §f" + String.join(", ", noms));
+                }
+                player.sendMessage("§7==========================================");
                 return true;
 
             case "recuperer":
