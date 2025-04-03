@@ -7,11 +7,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import me.jjkuhc.jjkgame.VictoryManager;
+import org.bukkit.GameMode;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 
 public class DeathManager implements Listener {
 
     private static boolean deathMessageEnabled = true;
+    private static final Set<UUID> deadPlayers = new HashSet<>();
+
 
     public static boolean isDeathMessageEnabled() {
         return deathMessageEnabled;
@@ -26,6 +34,7 @@ public class DeathManager implements Listener {
         if (!deathMessageEnabled) return;
 
         Player deceased = event.getEntity();
+        deadPlayers.add(deceased.getUniqueId());
 
         // 🚫 Supprimer les Nether Stars des drops
         event.getDrops().removeIf(item -> item != null && item.getType() == Material.NETHER_STAR);
@@ -80,6 +89,22 @@ public class DeathManager implements Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
         }
+    }
+
+    @EventHandler
+    public void onGameModeChange(PlayerGameModeChangeEvent event) {
+        Player player = event.getPlayer();
+
+        // Si joueur mort essaie de repasser en survival (ou autre), on le remet en spectateur
+        if (isDead(player) && event.getNewGameMode() != GameMode.SPECTATOR) {
+            Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("JJKUHC"), () -> {
+                player.setGameMode(GameMode.SPECTATOR);
+            }, 1L); // 1 tick après le changement
+        }
+    }
+
+    public static boolean isDead(Player player) {
+        return deadPlayers.contains(player.getUniqueId());
     }
 
 }
