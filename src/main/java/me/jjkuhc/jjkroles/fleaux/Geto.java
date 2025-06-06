@@ -34,7 +34,8 @@ public class Geto implements Listener {
     private boolean lisereUtilise = false;
     private static final int LISERE_COUT = 1000;
     private static final int LISERE_RAYON = 30;
-    private static final int LISERE_DELAY_MINUTES = 1; // 30 minutes avant de l'utiliser
+    // Délai avant de pouvoir utiliser Lisère du Supplice (en minutes)
+    private static final int LISERE_DELAY_MINUTES = 1; // 1 minute avant de l'utiliser
     private static final int LISERE_DUREE = 5 * 60; // 5 minutes en secondes
     private static final int LISERE_DUREE_GOJO = 3 * 60; // 3 minutes pour Gojo
     private long lisereDisponibleApres = 0; // Pour timer l'activation
